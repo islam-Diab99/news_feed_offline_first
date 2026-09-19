@@ -1,0 +1,1670 @@
+[
+ {
+  "id": "a_flutter_roadmap",
+  "title": "Flutter Team Shares the Next Performance Roadmap",
+  "summary": "New rendering and tooling work targets smoother apps.",
+  "source": "Mobile Daily",
+  "author": {
+   "id": "u_maya",
+   "name": "Maya Chen",
+   "avatar": "https://picsum.photos/seed/u_maya/120",
+   "bio": "Mobile technology editor."
+  },
+  "topicId": "t_technology",
+  "publishedAt": "2026-09-19T09:00:00Z",
+  "image": "https://picsum.photos/seed/flutter-news/900/600",
+  "tags": [
+   "flutter",
+   "mobile"
+  ],
+  "likes": 126,
+  "comments": 8,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 1,
+  "readTimeMinutes": 8,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Flutter Team Shares the Next Performance Roadmap. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/flutter-news-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following flutter, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_architecture_patterns",
+   "a_ai_policy",
+   "a_open_source_funding"
+  ]
+ },
+ {
+  "id": "a_clean_energy",
+  "title": "Battery Breakthrough Improves Grid Storage Efficiency",
+  "summary": "Researchers report longer cycle life in early trials.",
+  "source": "Science Journal",
+  "author": {
+   "id": "u_omar",
+   "name": "Omar Hassan",
+   "avatar": "https://picsum.photos/seed/u_omar/120",
+   "bio": "Science correspondent covering energy and climate."
+  },
+  "topicId": "t_science",
+  "publishedAt": "2026-09-18T23:00:00Z",
+  "image": "https://picsum.photos/seed/energy/900/600",
+  "tags": [
+   "energy",
+   "research"
+  ],
+  "likes": 28,
+  "comments": 1,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 1,
+  "readTimeMinutes": 4,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Battery Breakthrough Improves Grid Storage Efficiency. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/energy-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following energy, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_coral_recovery",
+   "a_fusion_step",
+   "a_mars_samples"
+  ]
+ },
+ {
+  "id": "a_market_week",
+  "title": "Markets Open Higher as Technology Shares Advance",
+  "summary": "Investors watch inflation data and earnings guidance.",
+  "source": "Market Brief",
+  "author": {
+   "id": "u_lina",
+   "name": "Lina Adel",
+   "avatar": "https://picsum.photos/seed/u_lina/120",
+   "bio": "Markets reporter."
+  },
+  "topicId": "t_business",
+  "publishedAt": "2026-09-18T20:00:00Z",
+  "image": "https://picsum.photos/seed/market/900/600",
+  "tags": [
+   "markets"
+  ],
+  "likes": 291,
+  "comments": 26,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 2,
+  "readTimeMinutes": 6,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Markets Open Higher as Technology Shares Advance. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/market-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following markets, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_retail_shift",
+   "a_startup_funding",
+   "a_green_bonds"
+  ]
+ },
+ {
+  "id": "a_architecture_patterns",
+  "title": "Choosing an Architecture That Survives Your Roadmap",
+  "summary": "Layered designs age better than clever ones, engineers argue.",
+  "source": "TechWire",
+  "author": {
+   "id": "u_sara",
+   "name": "Sara Nabil",
+   "avatar": "https://picsum.photos/seed/u_sara/120",
+   "bio": "Sports feature writer."
+  },
+  "topicId": "t_technology",
+  "publishedAt": "2026-09-18T11:00:00Z",
+  "image": "https://picsum.photos/seed/arch/900/600",
+  "tags": [
+   "architecture",
+   "engineering"
+  ],
+  "likes": 228,
+  "comments": 21,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 3,
+  "readTimeMinutes": 4,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Choosing an Architecture That Survives Your Roadmap. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/arch-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following architecture, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_ai_policy",
+   "a_flutter_roadmap",
+   "a_chip_supply"
+  ]
+ },
+ {
+  "id": "a_dart_tooling",
+  "title": "Dart Tooling Update Cuts Build Times for Large Apps",
+  "summary": "Incremental compilation improvements land in the stable channel.",
+  "source": "Future Stack",
+  "author": {
+   "id": "u_karim",
+   "name": "Karim Fouad",
+   "avatar": "https://picsum.photos/seed/u_karim/120",
+   "bio": "Health and medicine reporter."
+  },
+  "topicId": "t_technology",
+  "publishedAt": "2026-09-18T08:00:00Z",
+  "image": "https://picsum.photos/seed/dart/900/600",
+  "tags": [
+   "dart",
+   "tooling"
+  ],
+  "likes": 206,
+  "comments": 6,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 3,
+  "readTimeMinutes": 9,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Dart Tooling Update Cuts Build Times for Large Apps. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/dart-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following dart, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_ai_policy",
+   "a_flutter_roadmap",
+   "a_chip_supply"
+  ]
+ },
+ {
+  "id": "a_ai_policy",
+  "title": "Regulators Draft New Guidelines for AI Assistants",
+  "summary": "The proposal focuses on transparency and data handling.",
+  "source": "TechWire",
+  "author": {
+   "id": "u_nour",
+   "name": "Nour ElDin",
+   "avatar": "https://picsum.photos/seed/u_nour/120",
+   "bio": "Culture critic and essayist."
+  },
+  "topicId": "t_technology",
+  "publishedAt": "2026-09-18T01:00:00Z",
+  "image": "https://picsum.photos/seed/ai-policy/900/600",
+  "tags": [
+   "ai",
+   "policy"
+  ],
+  "likes": 247,
+  "comments": 34,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 1,
+  "readTimeMinutes": 6,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Regulators Draft New Guidelines for AI Assistants. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/ai-policy-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following ai, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_open_source_funding",
+   "a_dart_tooling",
+   "a_flutter_roadmap"
+  ]
+ },
+ {
+  "id": "a_chip_supply",
+  "title": "Chipmakers Expand Capacity as Demand Stabilizes",
+  "summary": "New fabs come online after two turbulent years.",
+  "source": "Future Stack",
+  "author": {
+   "id": "u_dina",
+   "name": "Dina Mansour",
+   "avatar": "https://picsum.photos/seed/u_dina/120",
+   "bio": "Startup and venture reporter."
+  },
+  "topicId": "t_technology",
+  "publishedAt": "2026-09-17T21:00:00Z",
+  "image": "https://picsum.photos/seed/chips/900/600",
+  "tags": [
+   "hardware",
+   "supply-chain"
+  ],
+  "likes": 197,
+  "comments": 36,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 2,
+  "readTimeMinutes": 8,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Chipmakers Expand Capacity as Demand Stabilizes. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/chips-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following hardware, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_open_source_funding",
+   "a_dart_tooling",
+   "a_ai_policy"
+  ]
+ },
+ {
+  "id": "a_startup_funding",
+  "title": "Seed Funding Rebounds in Regional Startup Hubs",
+  "summary": "Early-stage rounds grow for the third straight quarter.",
+  "source": "Startup Post",
+  "author": {
+   "id": "u_youssef",
+   "name": "Youssef Tarek",
+   "avatar": "https://picsum.photos/seed/u_youssef/120",
+   "bio": "Technology analyst."
+  },
+  "topicId": "t_business",
+  "publishedAt": "2026-09-17T15:00:00Z",
+  "image": "https://picsum.photos/seed/funding/900/600",
+  "tags": [
+   "startups",
+   "venture"
+  ],
+  "likes": 52,
+  "comments": 54,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 2,
+  "readTimeMinutes": 9,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Seed Funding Rebounds in Regional Startup Hubs. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/funding-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following startups, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_market_week",
+   "a_retail_shift",
+   "a_green_bonds"
+  ]
+ },
+ {
+  "id": "a_green_bonds",
+  "title": "Green Bonds Attract Record Institutional Interest",
+  "summary": "Sustainable debt issuance hits a new quarterly high.",
+  "source": "Global Ledger",
+  "author": {
+   "id": "u_maya",
+   "name": "Maya Chen",
+   "avatar": "https://picsum.photos/seed/u_maya/120",
+   "bio": "Mobile technology editor."
+  },
+  "topicId": "t_business",
+  "publishedAt": "2026-09-17T09:00:00Z",
+  "image": "https://picsum.photos/seed/bonds/900/600",
+  "tags": [
+   "finance",
+   "sustainability"
+  ],
+  "likes": 198,
+  "comments": 10,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 3,
+  "readTimeMinutes": 5,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Green Bonds Attract Record Institutional Interest. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/bonds-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following finance, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_startup_funding",
+   "a_retail_shift",
+   "a_market_week"
+  ]
+ },
+ {
+  "id": "a_retail_shift",
+  "title": "Retailers Bet on Smaller, Smarter Neighborhood Stores",
+  "summary": "Chains rethink footprints as delivery habits settle.",
+  "source": "Market Brief",
+  "author": {
+   "id": "u_omar",
+   "name": "Omar Hassan",
+   "avatar": "https://picsum.photos/seed/u_omar/120",
+   "bio": "Science correspondent covering energy and climate."
+  },
+  "topicId": "t_business",
+  "publishedAt": "2026-09-17T02:00:00Z",
+  "image": "https://picsum.photos/seed/retail/900/600",
+  "tags": [
+   "retail"
+  ],
+  "likes": 99,
+  "comments": 34,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 2,
+  "readTimeMinutes": 4,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Retailers Bet on Smaller, Smarter Neighborhood Stores. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/retail-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following retail, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_green_bonds",
+   "a_startup_funding",
+   "a_market_week"
+  ]
+ },
+ {
+  "id": "a_derby_final",
+  "title": "City Derby Ends in Dramatic Stoppage-Time Equalizer",
+  "summary": "A 94th-minute strike splits the points and the city.",
+  "source": "The Final Whistle",
+  "author": {
+   "id": "u_lina",
+   "name": "Lina Adel",
+   "avatar": "https://picsum.photos/seed/u_lina/120",
+   "bio": "Markets reporter."
+  },
+  "topicId": "t_sports",
+  "publishedAt": "2026-09-16T18:00:00Z",
+  "image": "https://picsum.photos/seed/derby/900/600",
+  "tags": [
+   "football"
+  ],
+  "likes": 178,
+  "comments": 53,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 1,
+  "readTimeMinutes": 4,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "City Derby Ends in Dramatic Stoppage-Time Equalizer. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/derby-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following football, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_tennis_rising",
+   "a_esports_league",
+   "a_marathon_record"
+  ]
+ },
+ {
+  "id": "a_marathon_record",
+  "title": "National Marathon Record Falls on a Cool Morning",
+  "summary": "Pacing discipline and new shoes carry the day.",
+  "source": "Arena News",
+  "author": {
+   "id": "u_sara",
+   "name": "Sara Nabil",
+   "avatar": "https://picsum.photos/seed/u_sara/120",
+   "bio": "Sports feature writer."
+  },
+  "topicId": "t_sports",
+  "publishedAt": "2026-09-16T15:00:00Z",
+  "image": "https://picsum.photos/seed/marathon/900/600",
+  "tags": [
+   "athletics"
+  ],
+  "likes": 45,
+  "comments": 13,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 3,
+  "readTimeMinutes": 4,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "National Marathon Record Falls on a Cool Morning. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/marathon-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following athletics, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_tennis_rising",
+   "a_esports_league",
+   "a_derby_final"
+  ]
+ },
+ {
+  "id": "a_tennis_rising",
+  "title": "Teen Qualifier Storms Into First Tour Semifinal",
+  "summary": "A fearless baseline game upsets two seeded players.",
+  "source": "Match Point",
+  "author": {
+   "id": "u_karim",
+   "name": "Karim Fouad",
+   "avatar": "https://picsum.photos/seed/u_karim/120",
+   "bio": "Health and medicine reporter."
+  },
+  "topicId": "t_sports",
+  "publishedAt": "2026-09-16T06:00:00Z",
+  "image": "https://picsum.photos/seed/tennis/900/600",
+  "tags": [
+   "tennis"
+  ],
+  "likes": 147,
+  "comments": 8,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 2,
+  "readTimeMinutes": 8,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Teen Qualifier Storms Into First Tour Semifinal. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/tennis-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following tennis, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_marathon_record",
+   "a_esports_league",
+   "a_derby_final"
+  ]
+ },
+ {
+  "id": "a_coral_recovery",
+  "title": "Coral Nurseries Show Faster-Than-Expected Recovery",
+  "summary": "Restored reefs are attracting fish within months.",
+  "source": "Science Journal",
+  "author": {
+   "id": "u_nour",
+   "name": "Nour ElDin",
+   "avatar": "https://picsum.photos/seed/u_nour/120",
+   "bio": "Culture critic and essayist."
+  },
+  "topicId": "t_science",
+  "publishedAt": "2026-09-15T23:00:00Z",
+  "image": "https://picsum.photos/seed/coral/900/600",
+  "tags": [
+   "ocean",
+   "climate"
+  ],
+  "likes": 310,
+  "comments": 25,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 3,
+  "readTimeMinutes": 4,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Coral Nurseries Show Faster-Than-Expected Recovery. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/coral-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following ocean, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_fusion_step",
+   "a_desert_solar",
+   "a_mars_samples"
+  ]
+ },
+ {
+  "id": "a_mars_samples",
+  "title": "Mars Sample Return Mission Clears Design Review",
+  "summary": "Engineers simplify the retrieval sequence to cut risk.",
+  "source": "Orbit Weekly",
+  "author": {
+   "id": "u_dina",
+   "name": "Dina Mansour",
+   "avatar": "https://picsum.photos/seed/u_dina/120",
+   "bio": "Startup and venture reporter."
+  },
+  "topicId": "t_science",
+  "publishedAt": "2026-09-15T20:00:00Z",
+  "image": "https://picsum.photos/seed/mars/900/600",
+  "tags": [
+   "space"
+  ],
+  "likes": 68,
+  "comments": 9,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 2,
+  "readTimeMinutes": 9,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Mars Sample Return Mission Clears Design Review. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/mars-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following space, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_desert_solar",
+   "a_clean_energy",
+   "a_fusion_step"
+  ]
+ },
+ {
+  "id": "a_fusion_step",
+  "title": "Fusion Test Sustains Plasma for a Record Interval",
+  "summary": "A step forward, though commercial power remains distant.",
+  "source": "Orbit Weekly",
+  "author": {
+   "id": "u_youssef",
+   "name": "Youssef Tarek",
+   "avatar": "https://picsum.photos/seed/u_youssef/120",
+   "bio": "Technology analyst."
+  },
+  "topicId": "t_science",
+  "publishedAt": "2026-09-15T12:00:00Z",
+  "image": "https://picsum.photos/seed/fusion/900/600",
+  "tags": [
+   "energy",
+   "physics"
+  ],
+  "likes": 317,
+  "comments": 29,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 3,
+  "readTimeMinutes": 7,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Fusion Test Sustains Plasma for a Record Interval. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/fusion-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following energy, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_clean_energy",
+   "a_coral_recovery",
+   "a_mars_samples"
+  ]
+ },
+ {
+  "id": "a_sleep_study",
+  "title": "Large Sleep Study Links Routine to Recovery Quality",
+  "summary": "Consistency matters more than total hours, data suggests.",
+  "source": "Health Signal",
+  "author": {
+   "id": "u_maya",
+   "name": "Maya Chen",
+   "avatar": "https://picsum.photos/seed/u_maya/120",
+   "bio": "Mobile technology editor."
+  },
+  "topicId": "t_health",
+  "publishedAt": "2026-09-15T09:00:00Z",
+  "image": "https://picsum.photos/seed/sleep/900/600",
+  "tags": [
+   "sleep",
+   "research"
+  ],
+  "likes": 186,
+  "comments": 7,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 3,
+  "readTimeMinutes": 6,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Large Sleep Study Links Routine to Recovery Quality. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/sleep-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following sleep, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_wearable_health",
+   "a_urban_walking",
+   "a_nutrition_labels"
+  ]
+ },
+ {
+  "id": "a_urban_walking",
+  "title": "Cities Redesign Crossings to Get People Walking",
+  "summary": "Small infrastructure changes show outsized health effects.",
+  "source": "Wellbeing Times",
+  "author": {
+   "id": "u_omar",
+   "name": "Omar Hassan",
+   "avatar": "https://picsum.photos/seed/u_omar/120",
+   "bio": "Science correspondent covering energy and climate."
+  },
+  "topicId": "t_health",
+  "publishedAt": "2026-09-15T02:00:00Z",
+  "image": "https://picsum.photos/seed/walking/900/600",
+  "tags": [
+   "urban",
+   "fitness"
+  ],
+  "likes": 268,
+  "comments": 48,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 2,
+  "readTimeMinutes": 7,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Cities Redesign Crossings to Get People Walking. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/walking-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following urban, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_nutrition_labels",
+   "a_sleep_study",
+   "a_wearable_health"
+  ]
+ },
+ {
+  "id": "a_nutrition_labels",
+  "title": "Clearer Nutrition Labels Change What Shoppers Buy",
+  "summary": "Front-of-pack scores nudge carts toward better choices.",
+  "source": "Health Signal",
+  "author": {
+   "id": "u_lina",
+   "name": "Lina Adel",
+   "avatar": "https://picsum.photos/seed/u_lina/120",
+   "bio": "Markets reporter."
+  },
+  "topicId": "t_health",
+  "publishedAt": "2026-09-14T21:00:00Z",
+  "image": "https://picsum.photos/seed/labels/900/600",
+  "tags": [
+   "nutrition"
+  ],
+  "likes": 90,
+  "comments": 23,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 2,
+  "readTimeMinutes": 7,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Clearer Nutrition Labels Change What Shoppers Buy. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/labels-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following nutrition, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_wearable_health",
+   "a_urban_walking",
+   "a_sleep_study"
+  ]
+ },
+ {
+  "id": "a_film_festival",
+  "title": "Independent Films Dominate This Year's Festival Slate",
+  "summary": "Small budgets, big swings, and three breakout debuts.",
+  "source": "Frame & Verse",
+  "author": {
+   "id": "u_sara",
+   "name": "Sara Nabil",
+   "avatar": "https://picsum.photos/seed/u_sara/120",
+   "bio": "Sports feature writer."
+  },
+  "topicId": "t_culture",
+  "publishedAt": "2026-09-14T11:00:00Z",
+  "image": "https://picsum.photos/seed/festival/900/600",
+  "tags": [
+   "film"
+  ],
+  "likes": 262,
+  "comments": 1,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 1,
+  "readTimeMinutes": 5,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Independent Films Dominate This Year's Festival Slate. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/festival-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following film, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_museum_night",
+   "a_book_prize"
+  ]
+ },
+ {
+  "id": "a_museum_night",
+  "title": "Museums Extend Late Hours After Record Turnout",
+  "summary": "Night programming draws a younger crowd to galleries.",
+  "source": "Canvas Review",
+  "author": {
+   "id": "u_karim",
+   "name": "Karim Fouad",
+   "avatar": "https://picsum.photos/seed/u_karim/120",
+   "bio": "Health and medicine reporter."
+  },
+  "topicId": "t_culture",
+  "publishedAt": "2026-09-14T07:00:00Z",
+  "image": "https://picsum.photos/seed/museum/900/600",
+  "tags": [
+   "museums"
+  ],
+  "likes": 135,
+  "comments": 56,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 1,
+  "readTimeMinutes": 3,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Museums Extend Late Hours After Record Turnout. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/museum-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following museums, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_film_festival",
+   "a_book_prize"
+  ]
+ },
+ {
+  "id": "a_book_prize",
+  "title": "Debut Novelist Wins Regional Book Prize",
+  "summary": "A quiet family saga beats four heavyweight finalists.",
+  "source": "Frame & Verse",
+  "author": {
+   "id": "u_nour",
+   "name": "Nour ElDin",
+   "avatar": "https://picsum.photos/seed/u_nour/120",
+   "bio": "Culture critic and essayist."
+  },
+  "topicId": "t_culture",
+  "publishedAt": "2026-09-14T00:00:00Z",
+  "image": "https://picsum.photos/seed/bookprize/900/600",
+  "tags": [
+   "books"
+  ],
+  "likes": 77,
+  "comments": 42,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 4,
+  "readTimeMinutes": 7,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Debut Novelist Wins Regional Book Prize. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/bookprize-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following books, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_film_festival",
+   "a_museum_night"
+  ]
+ },
+ {
+  "id": "a_wearable_health",
+  "title": "Wearables Get Better at Flagging Irregular Rhythms",
+  "summary": "New algorithms cut false alerts nearly in half.",
+  "source": "Health Signal",
+  "author": {
+   "id": "u_dina",
+   "name": "Dina Mansour",
+   "avatar": "https://picsum.photos/seed/u_dina/120",
+   "bio": "Startup and venture reporter."
+  },
+  "topicId": "t_health",
+  "publishedAt": "2026-09-13T20:00:00Z",
+  "image": "https://picsum.photos/seed/wearable/900/600",
+  "tags": [
+   "wearables",
+   "cardio"
+  ],
+  "likes": 288,
+  "comments": 48,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 2,
+  "readTimeMinutes": 8,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Wearables Get Better at Flagging Irregular Rhythms. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/wearable-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following wearables, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_urban_walking",
+   "a_nutrition_labels",
+   "a_sleep_study"
+  ]
+ },
+ {
+  "id": "a_esports_league",
+  "title": "University Esports League Doubles Its Rosters",
+  "summary": "Campus arenas and scholarships fuel the expansion.",
+  "source": "Arena News",
+  "author": {
+   "id": "u_youssef",
+   "name": "Youssef Tarek",
+   "avatar": "https://picsum.photos/seed/u_youssef/120",
+   "bio": "Technology analyst."
+  },
+  "topicId": "t_sports",
+  "publishedAt": "2026-09-13T13:00:00Z",
+  "image": "https://picsum.photos/seed/esports/900/600",
+  "tags": [
+   "esports"
+  ],
+  "likes": 276,
+  "comments": 28,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 1,
+  "readTimeMinutes": 4,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "University Esports League Doubles Its Rosters. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/esports-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following esports, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_marathon_record",
+   "a_tennis_rising",
+   "a_derby_final"
+  ]
+ },
+ {
+  "id": "a_open_source_funding",
+  "title": "Foundations Move to Fund Critical Open Source Maintainers",
+  "summary": "A pooled fund targets the busiest, least-funded projects.",
+  "source": "TechWire",
+  "author": {
+   "id": "u_maya",
+   "name": "Maya Chen",
+   "avatar": "https://picsum.photos/seed/u_maya/120",
+   "bio": "Mobile technology editor."
+  },
+  "topicId": "t_technology",
+  "publishedAt": "2026-09-13T08:00:00Z",
+  "image": "https://picsum.photos/seed/oss/900/600",
+  "tags": [
+   "open-source"
+  ],
+  "likes": 313,
+  "comments": 35,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 2,
+  "readTimeMinutes": 7,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Foundations Move to Fund Critical Open Source Maintainers. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/oss-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following open-source, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_flutter_roadmap",
+   "a_dart_tooling",
+   "a_chip_supply"
+  ]
+ },
+ {
+  "id": "a_desert_solar",
+  "title": "Desert Solar Farm Pairs Panels With Native Planting",
+  "summary": "Agrivoltaics pilots report cooler panels and higher yield.",
+  "source": "Science Journal",
+  "author": {
+   "id": "u_omar",
+   "name": "Omar Hassan",
+   "avatar": "https://picsum.photos/seed/u_omar/120",
+   "bio": "Science correspondent covering energy and climate."
+  },
+  "topicId": "t_science",
+  "publishedAt": "2026-09-13T02:00:00Z",
+  "image": "https://picsum.photos/seed/solar/900/600",
+  "tags": [
+   "solar",
+   "climate"
+  ],
+  "likes": 129,
+  "comments": 4,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 1,
+  "readTimeMinutes": 9,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Desert Solar Farm Pairs Panels With Native Planting. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/solar-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following solar, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_clean_energy",
+   "a_fusion_step",
+   "a_mars_samples"
+  ]
+ },
+ {
+  "id": "a_quantum_api",
+  "title": "Cloud Providers Open Early Access to Quantum APIs",
+  "summary": "Developers get sandboxed access to small qubit systems.",
+  "source": "Future Stack",
+  "author": {
+   "id": "u_lina",
+   "name": "Lina Adel",
+   "avatar": "https://picsum.photos/seed/u_lina/120",
+   "bio": "Markets reporter."
+  },
+  "topicId": "t_technology",
+  "publishedAt": "2026-09-12T19:00:00Z",
+  "image": "https://picsum.photos/seed/quantum/900/600",
+  "tags": [
+   "quantum",
+   "cloud"
+  ],
+  "likes": 154,
+  "comments": 42,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 4,
+  "readTimeMinutes": 4,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Cloud Providers Open Early Access to Quantum APIs. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/quantum-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following quantum, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_flutter_roadmap",
+   "a_chip_supply",
+   "a_architecture_patterns"
+  ],
+  "reserved": true
+ },
+ {
+  "id": "a_rate_decision",
+  "title": "Central Bank Holds Rates, Signals Patience",
+  "summary": "Policymakers want more data before the next move.",
+  "source": "Market Brief",
+  "author": {
+   "id": "u_sara",
+   "name": "Sara Nabil",
+   "avatar": "https://picsum.photos/seed/u_sara/120",
+   "bio": "Sports feature writer."
+  },
+  "topicId": "t_business",
+  "publishedAt": "2026-09-12T11:00:00Z",
+  "image": "https://picsum.photos/seed/rates/900/600",
+  "tags": [
+   "markets",
+   "policy"
+  ],
+  "likes": 136,
+  "comments": 50,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 4,
+  "readTimeMinutes": 9,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Central Bank Holds Rates, Signals Patience. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/rates-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following markets, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_startup_funding",
+   "a_green_bonds",
+   "a_retail_shift"
+  ],
+  "reserved": true
+ },
+ {
+  "id": "a_injury_return",
+  "title": "Star Striker Returns to Training Ahead of Schedule",
+  "summary": "Medical staff credit a cautious, phased rehab plan.",
+  "source": "Match Point",
+  "author": {
+   "id": "u_karim",
+   "name": "Karim Fouad",
+   "avatar": "https://picsum.photos/seed/u_karim/120",
+   "bio": "Health and medicine reporter."
+  },
+  "topicId": "t_sports",
+  "publishedAt": "2026-09-12T06:00:00Z",
+  "image": "https://picsum.photos/seed/striker/900/600",
+  "tags": [
+   "football"
+  ],
+  "likes": 232,
+  "comments": 22,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 4,
+  "readTimeMinutes": 6,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Star Striker Returns to Training Ahead of Schedule. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/striker-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following football, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_marathon_record",
+   "a_derby_final",
+   "a_tennis_rising"
+  ],
+  "reserved": true
+ },
+ {
+  "id": "a_gene_therapy",
+  "title": "Gene Therapy Trial Reports Durable Two-Year Results",
+  "summary": "Benefits persist in the majority of participants.",
+  "source": "Wellbeing Times",
+  "author": {
+   "id": "u_nour",
+   "name": "Nour ElDin",
+   "avatar": "https://picsum.photos/seed/u_nour/120",
+   "bio": "Culture critic and essayist."
+  },
+  "topicId": "t_health",
+  "publishedAt": "2026-09-12T00:00:00Z",
+  "image": "https://picsum.photos/seed/gene/900/600",
+  "tags": [
+   "genetics",
+   "trials"
+  ],
+  "likes": 43,
+  "comments": 25,
+  "isLiked": false,
+  "isBookmarked": false,
+  "version": 3,
+  "readTimeMinutes": 9,
+  "body": [
+   {
+    "type": "paragraph",
+    "text": "Gene Therapy Trial Reports Durable Two-Year Results. The development, confirmed this week by people close to the work, has been months in the making and is already reshaping conversations across the field."
+   },
+   {
+    "type": "paragraph",
+    "text": "Early reactions have been cautiously optimistic. Analysts point out that headline numbers rarely tell the whole story, and that the second-order effects \u2014 on teams, budgets, and timelines \u2014 will take a quarter or two to become visible."
+   },
+   {
+    "type": "image",
+    "url": "https://picsum.photos/seed/gene-body/900/500"
+   },
+   {
+    "type": "quote",
+    "text": "The interesting part is not the announcement itself, but what it makes possible next."
+   },
+   {
+    "type": "paragraph",
+    "text": "Observers note that similar efforts have stumbled before, usually on execution rather than ambition. What sets this attempt apart, supporters argue, is the discipline of its scope: a small set of clearly measurable goals instead of a sweeping promise."
+   },
+   {
+    "type": "paragraph",
+    "text": "For readers following genetics, the practical advice is unchanged: watch the data, not the headlines. The next milestone is expected within weeks, and it should show whether the early momentum holds."
+   }
+  ],
+  "related": [
+   "a_sleep_study",
+   "a_nutrition_labels",
+   "a_wearable_health"
+  ],
+  "reserved": true
+ }
+]
