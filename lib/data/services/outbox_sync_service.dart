@@ -60,15 +60,29 @@ class OutboxSyncService implements SyncService {
       _activityController.add(SyncStarted(mutations.length));
 
       final response = await _api.sync(mutations);
+      final appliedKeys = response.applied.toSet();
+      final settled = mutations
+          .where((m) => appliedKeys.contains(m.idempotencyKey))
+          .map((m) => m.articleId)
+          .toSet();
       await _store.removeMutations(response.applied);
 
       for (final serverArticle in response.conflicts) {
+        settled.remove(serverArticle.id);
         final local = await _store.article(serverArticle.id);
         final reconciled = serverArticle.copyWith(
           isBookmarked: local?.isBookmarked ?? serverArticle.isBookmarked,
         );
         await _store.upsertArticles([reconciled]);
         _bus.publish(ArticleChanged(reconciled));
+      }
+
+      // The queue has drained, so the local state is now the agreed state.
+      // Republish it: listeners that loaded before the sync would otherwise
+      // keep showing the pre-sync value until a manual refresh.
+      for (final id in settled) {
+        final local = await _store.article(id);
+        if (local != null) _bus.publish(ArticleChanged(local));
       }
       _activityController.add(SyncSucceeded(response.applied.length));
     } on AppException {

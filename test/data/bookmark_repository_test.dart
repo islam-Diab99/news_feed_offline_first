@@ -5,8 +5,10 @@ import 'package:hive_ce/hive.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:vlau_assessment/core/error/app_exception.dart';
 import 'package:vlau_assessment/data/datasources/local/hive_local_store.dart';
+import 'package:vlau_assessment/data/datasources/remote/api_client.dart';
 import 'package:vlau_assessment/data/models/outbox_mutation.dart';
 import 'package:vlau_assessment/data/repositories/bookmark_repository_impl.dart';
+import 'package:vlau_assessment/data/repositories/feed_repository_impl.dart';
 import 'package:vlau_assessment/domain/services/article_update_bus.dart';
 
 import '../helpers.dart';
@@ -111,4 +113,54 @@ void main() {
       expect(await store.pendingMutations(), hasLength(1));
     },
   );
+
+  test(
+    'a feed load after restart keeps the bookmark on the feed item',
+    () async {
+      await buildRepository().toggle(makeArticle('a1'));
+
+      await Hive.close();
+      Hive.init(tempDir.path);
+      store = await HiveLocalStore.open();
+
+      // The server no longer remembers the bookmark (mock backend restarted,
+      // or the flag simply is not part of the feed payload).
+      when(() => api.getFeed(page: 1, topicId: null, source: null)).thenAnswer(
+        (_) async => FeedPageResponse(
+          items: [makeArticle('a1'), makeArticle('a2')],
+          page: 1,
+          total: 2,
+        ),
+      );
+
+      final page = await FeedRepositoryImpl(
+        api: api,
+        store: store,
+      ).firstPage();
+
+      expect(page.items.firstWhere((a) => a.id == 'a1').isBookmarked, isTrue);
+      expect(page.items.firstWhere((a) => a.id == 'a2').isBookmarked, isFalse);
+      // The cache must not be clobbered either.
+      expect((await store.article('a1'))!.isBookmarked, isTrue);
+    },
+  );
+
+  test('a feed load reflects a bookmark removed locally', () async {
+    final repository = buildRepository();
+    await repository.toggle(makeArticle('a1'));
+    await repository.toggle(makeArticle('a1', isBookmarked: true));
+
+    when(() => api.getFeed(page: 1, topicId: null, source: null)).thenAnswer(
+      (_) async => FeedPageResponse(
+        // Server still echoes the bookmark it has not caught up on.
+        items: [makeArticle('a1', isBookmarked: true)],
+        page: 1,
+        total: 1,
+      ),
+    );
+
+    final page = await FeedRepositoryImpl(api: api, store: store).firstPage();
+
+    expect(page.items.single.isBookmarked, isFalse);
+  });
 }

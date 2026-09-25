@@ -153,4 +153,71 @@ void main() {
 
     await bloc.close();
   });
+
+  test('clearing both filters costs exactly one search', () async {
+    when(
+      () => repository.sources(topicId: any(named: 'topicId')),
+    ).thenAnswer((_) async => ['TechWire', 'Future Stack']);
+    when(
+      () => repository.search(
+        any(),
+        topicId: any(named: 'topicId'),
+        source: any(named: 'source'),
+      ),
+    ).thenAnswer((_) async => resultFor('a1'));
+
+    final bloc = buildBloc();
+    bloc.add(const SearchQueryChanged('flutter'));
+    await Future<void>.delayed(debounce * 3);
+    bloc.add(const SearchTopicFilterChanged('t_technology'));
+    await Future<void>.delayed(debounce * 2);
+    bloc.add(const SearchSourceFilterChanged('TechWire'));
+    await Future<void>.delayed(debounce * 2);
+
+    // The opening unfiltered search matches the same verify below.
+    clearInteractions(repository);
+    bloc.add(const SearchFiltersCleared());
+    await Future<void>.delayed(debounce * 3);
+
+    expect(bloc.state.topicId, isNull);
+    expect(bloc.state.source, isNull);
+    verify(
+      () => repository.search('flutter', topicId: null, source: null),
+    ).called(1);
+
+    await bloc.close();
+  });
+
+  test('re-selecting the active topic does not refetch', () async {
+    when(
+      () => repository.sources(topicId: any(named: 'topicId')),
+    ).thenAnswer((_) async => ['TechWire']);
+    when(
+      () => repository.search(
+        any(),
+        topicId: any(named: 'topicId'),
+        source: any(named: 'source'),
+      ),
+    ).thenAnswer((_) async => resultFor('a1'));
+
+    final bloc = buildBloc();
+    bloc.add(const SearchQueryChanged('flutter'));
+    await Future<void>.delayed(debounce * 3);
+    bloc.add(const SearchTopicFilterChanged('t_technology'));
+    await Future<void>.delayed(debounce * 2);
+
+    clearInteractions(repository);
+    bloc.add(const SearchTopicFilterChanged('t_technology'));
+    await Future<void>.delayed(debounce * 3);
+
+    verifyNever(
+      () => repository.search(
+        any(),
+        topicId: any(named: 'topicId'),
+        source: any(named: 'source'),
+      ),
+    );
+
+    await bloc.close();
+  });
 }

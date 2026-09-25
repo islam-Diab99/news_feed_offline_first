@@ -55,10 +55,10 @@ The "server" is `MockApiClient` — an in-process class that behaves like a smal
 | **Network latency** | Every call waits a random 300–700 ms | Skeletons, spinners, and footer loaders are actually visible |
 | **Going offline** | The **wifi icon in the feed app bar** makes every call throw `NetworkException` — even one already in flight | Toggle it on: offline banner appears, cached content keeps working. Real airplane mode (via `connectivity_plus`) behaves identically |
 | **Reaction failure** | Every **3rd** reaction call returns a server error | Like 3 articles in a row — the 3rd flips back with an error snackbar (optimistic rollback) |
-| **Someone else is using the app** | Each pull-to-refresh bumps a random article's like count and version | Refresh, then like an article you loaded earlier — if its version moved, the server's count wins over your ±1 guess (version conflict) |
+| **Someone else is using the app** | Each pull-to-refresh bumps exactly one story — likes +3 and version +1 — and it is always the story the refreshed page 1 pushes out of view | Note the **last story on the first page**, pull to refresh once, then scroll back down and like it: the server's count wins over your ±1 guess (version conflict). Deterministic, so it works every time |
 | **Breaking news** | Each pull-to-refresh publishes one reserved story stamped "just now" | Pull to refresh: a new story appears at the top, existing scroll position is kept |
 | **Publisher removes a story** | On the **2nd** pull-to-refresh, one story is deleted server-side | Bookmark something early, refresh twice: it vanishes from lists, and opening it shows a graceful "no longer available" state |
-| **Reconnect sync** | Queued offline mutations replay in order through `POST /sync`; conflicts return the authoritative version | Go offline, like + bookmark things, go back online — watch the outbox drain and counts reconcile |
+| **Reconnect sync** | Queued offline mutations replay in order through `POST /sync`; a queued reaction that the server already agrees with comes back as a conflict | Go offline, like + bookmark things, go back online — watch the outbox drain and counts reconcile. For the sync **conflict** path: like a story online, go offline, unlike then like it again (the queue coalesces to one `like` the server already has), then go back online |
 
 ---
 

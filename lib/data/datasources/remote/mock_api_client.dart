@@ -42,6 +42,7 @@ class MockApiClient implements ApiClient {
 
   int _reactionCalls = 0;
   int _refreshCalls = 0;
+  bool _conflictArmed = true;
 
   Future<void>? _loading;
 
@@ -169,12 +170,15 @@ class MockApiClient implements ApiClient {
       newItems.add(id);
     }
 
-    final live = _publishedIds
-        .where((id) => !_deletedIds.contains(id))
-        .toList();
+    // Simulate another reader by bumping one story per refresh. The target is
+    // deterministic on purpose: the first story on page 2, which a refresh does
+    // not re-fetch, so a client that paginated past page 1 is left holding a
+    // stale version and the next like reliably hits the conflict branch of
+    // [setReaction]. Random targets made that path impossible to demo.
+    final live = _liveRecords();
     if (live.isNotEmpty) {
-      final record = _records[live[_random.nextInt(live.length)]]!;
-      record['likes'] = (record['likes'] as int) + 1 + _random.nextInt(5);
+      final record = live[live.length > _pageSize ? _pageSize : live.length - 1];
+      record['likes'] = (record['likes'] as int) + 3;
       record['version'] = (record['version'] as int? ?? 1) + 1;
       updatedItems.add(record['id'] as String);
     }
@@ -267,6 +271,17 @@ class MockApiClient implements ApiClient {
     _reactionCalls++;
     if (_reactionCalls % 3 == 0) {
       throw const ServerException('Reaction was not saved. Please retry.');
+    }
+
+    // Demo hook, fires once: the first like on the story at the top of the
+    // feed simulates another reader getting there a moment earlier, so the
+    // version-conflict path is reachable with a single tap — no pagination or
+    // refreshes needed.
+    if (_conflictArmed && articleId == _liveRecords().first['id']) {
+      _conflictArmed = false;
+      record['isLiked'] = true;
+      record['likes'] = (record['likes'] as int) + 3;
+      record['version'] = (record['version'] as int? ?? 1) + 1;
     }
 
     final serverVersion = record['version'] as int? ?? 1;

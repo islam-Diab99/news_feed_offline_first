@@ -5,7 +5,9 @@ import 'package:mocktail/mocktail.dart';
 import 'package:vlau_assessment/core/error/app_exception.dart';
 import 'package:vlau_assessment/data/datasources/remote/api_client.dart';
 import 'package:vlau_assessment/data/models/outbox_mutation.dart';
+import 'package:vlau_assessment/data/repositories/feed_repository_impl.dart';
 import 'package:vlau_assessment/data/repositories/reaction_repository_impl.dart';
+import 'package:vlau_assessment/data/services/outbox_sync_service.dart';
 import 'package:vlau_assessment/domain/entities/article_update.dart';
 import 'package:vlau_assessment/domain/services/article_update_bus.dart';
 
@@ -19,6 +21,8 @@ void main() {
   late ReactionRepositoryImpl repository;
 
   final article = makeArticle('a1', likes: 10, isLiked: false, version: 3);
+
+  setUpAll(() => registerFallbackValue(<OutboxMutation>[]));
 
   setUp(() {
     api = MockApi();
@@ -172,5 +176,57 @@ void main() {
     final pending = await store.pendingMutations();
     expect(pending, hasLength(1));
     expect(pending.single.payload['reaction'], 'unlike');
+  });
+
+  test('a queued like survives a feed load that says otherwise', () async {
+    connectivity.setOnline(false);
+    await repository.toggleLike(article);
+
+    // Back online, fresh launch: the server has no record of the like yet.
+    connectivity.setOnline(true);
+    when(() => api.getFeed(page: 1, topicId: null, source: null)).thenAnswer(
+      (_) async => FeedPageResponse(
+        items: [makeArticle('a1', likes: 10, isLiked: false)],
+        page: 1,
+        total: 1,
+      ),
+    );
+
+    final page = await FeedRepositoryImpl(api: api, store: store).firstPage();
+
+    expect(page.items.single.isLiked, isTrue);
+    expect(page.items.single.likes, 11);
+  });
+
+  test('a settled sync republishes the article to the UI', () async {
+    connectivity.setOnline(false);
+    await repository.toggleLike(article);
+    final queued = (await store.pendingMutations()).single;
+
+    connectivity.setOnline(true);
+    when(() => api.sync(any())).thenAnswer(
+      (_) async => SyncResponse(applied: [queued.idempotencyKey]),
+    );
+
+    final updates = <ArticleUpdate>[];
+    final subscription = bus.stream.listen(updates.add);
+    final sync = OutboxSyncService(
+      api: api,
+      store: store,
+      connectivity: connectivity,
+      bus: bus,
+    );
+
+    await sync.syncNow();
+    await Future<void>.delayed(Duration.zero);
+
+    final published = updates.whereType<ArticleChanged>().last.article;
+    expect(published.id, 'a1');
+    expect(published.isLiked, isTrue);
+    expect(published.likes, 11);
+    expect(await store.pendingMutations(), isEmpty);
+
+    await subscription.cancel();
+    await sync.dispose();
   });
 }

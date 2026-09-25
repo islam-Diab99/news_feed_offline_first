@@ -30,9 +30,10 @@ class SearchRepositoryImpl implements SearchRepository {
         topicId: topicId,
         source: source,
       );
-      await _store.upsertArticles(response.items);
+      final items = await _store.withLocalState(response.items);
+      await _store.upsertArticles(items);
       return PagedArticles(
-        items: response.items,
+        items: items,
         nextCursor: response.nextCursor,
         total: response.total,
       );

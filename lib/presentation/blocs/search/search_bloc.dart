@@ -29,6 +29,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     );
     on<SearchTopicFilterChanged>(_onTopicChanged, transformer: restartable());
     on<SearchSourceFilterChanged>(_onSourceChanged, transformer: restartable());
+    on<SearchFiltersCleared>(_onFiltersCleared, transformer: restartable());
     on<SearchRetryRequested>(_onRetry, transformer: restartable());
     on<SearchNextPageRequested>(_onNextPage, transformer: droppable());
     on<_SearchArticleUpdated>(_onArticleUpdated, transformer: sequential());
@@ -76,6 +77,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     SearchTopicFilterChanged event,
     Emitter<SearchState> emit,
   ) async {
+    if (event.topicId == state.topicId) return;
     List<String> sources;
     try {
       sources = await _repository.sources(topicId: event.topicId);
@@ -98,6 +100,23 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     Emitter<SearchState> emit,
   ) async {
     emit(state.copyWith(source: event.source));
+    if (state.hasQuery) await _execute(state.query, emit);
+  }
+
+  /// Both filters reset in one handler so the reset costs a single search
+  /// instead of one per axis.
+  Future<void> _onFiltersCleared(
+    SearchFiltersCleared event,
+    Emitter<SearchState> emit,
+  ) async {
+    if (state.topicId == null && state.source == null) return;
+    List<String> sources;
+    try {
+      sources = await _repository.sources();
+    } on AppException {
+      sources = state.sources;
+    }
+    emit(state.copyWith(topicId: null, source: null, sources: sources));
     if (state.hasQuery) await _execute(state.query, emit);
   }
 

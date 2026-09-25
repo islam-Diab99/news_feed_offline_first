@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:hive_ce/hive.dart';
 
 import '../../../domain/entities/article.dart';
@@ -8,6 +9,15 @@ import '../../models/article_detail_model.dart';
 import '../../models/article_model.dart';
 import '../../models/outbox_mutation.dart';
 import 'local_store.dart';
+
+
+const _isolateDecodeThreshold = 200;
+
+List<Article> _decodeArticles(List<String> raw) {
+  return raw
+      .map((r) => ArticleModel.fromJson(jsonDecode(r) as Map<String, dynamic>))
+      .toList();
+}
 
 class HiveLocalStore implements LocalStore {
   HiveLocalStore._(
@@ -77,9 +87,18 @@ class HiveLocalStore implements LocalStore {
   @override
   Future<void> upsertArticles(List<Article> articles) async {
     await _articles.putAll({
-      for (final article in articles)
+      for (final article in await withLocalState(articles))
         article.id: jsonEncode(ArticleModel.toJson(article)),
     });
+  }
+
+  @override
+  Future<List<Article>> withLocalState(List<Article> articles) async {
+    return applyLocalState(
+      articles,
+      isBookmarked: _bookmarks.containsKey,
+      pendingLikes: pendingLikesFrom(await pendingMutations()),
+    );
   }
 
   @override
@@ -97,12 +116,11 @@ class HiveLocalStore implements LocalStore {
 
   @override
   Future<List<Article>> allArticles() async {
-    return _articles.values
-        .map(
-          (raw) =>
-              ArticleModel.fromJson(jsonDecode(raw) as Map<String, dynamic>),
-        )
-        .toList();
+    final raw = _articles.values.toList(growable: false);
+    if (raw.length < _isolateDecodeThreshold) {
+      return _decodeArticles(raw);
+    }
+    return compute(_decodeArticles, raw);
   }
 
   @override
@@ -208,3 +226,4 @@ class HiveLocalStore implements LocalStore {
   Future<void> setLastFeedSyncTime(DateTime time) =>
       _meta.put('lastFeedSync', time.toUtc().toIso8601String());
 }
+

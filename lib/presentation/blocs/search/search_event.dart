@@ -35,6 +35,10 @@ class SearchSourceFilterChanged extends SearchEvent {
   List<Object?> get props => [source];
 }
 
+class SearchFiltersCleared extends SearchEvent {
+  const SearchFiltersCleared();
+}
+
 class SearchNextPageRequested extends SearchEvent {
   const SearchNextPageRequested();
 }

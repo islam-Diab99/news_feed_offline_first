@@ -27,10 +27,17 @@ class ArticleRepositoryImpl implements ArticleRepository {
       switch (response) {
         case ArticleDetailData(:final detail):
           final cached = await _store.article(id);
-          final merged =
-              cached != null && cached.version >= detail.article.version
+          var merged = cached != null && cached.version >= detail.article.version
               ? detail.withArticle(cached)
               : detail;
+          // The bookmark box is the local source of truth; a server payload
+          // must never clear it.
+          final bookmarked = await _store.isBookmarked(id);
+          if (merged.article.isBookmarked != bookmarked) {
+            merged = merged.withArticle(
+              merged.article.copyWith(isBookmarked: bookmarked),
+            );
+          }
           await _store.saveDetail(merged);
           _bus.publish(ArticleChanged(merged.article));
           return ArticleDetailAvailable(
@@ -71,8 +78,11 @@ class ArticleRepositoryImpl implements ArticleRepository {
       try {
         final response = await _api.getArticle(id);
         if (response is ArticleDetailData) {
-          await _store.upsertArticles([response.detail.article]);
-          related.add(response.detail.article);
+          final hydrated = await _store.withLocalState([
+            response.detail.article,
+          ]);
+          await _store.upsertArticles(hydrated);
+          related.add(hydrated.single);
         }
       } on AppException catch (_) {}
     }

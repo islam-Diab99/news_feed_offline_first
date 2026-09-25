@@ -28,13 +28,14 @@ class FeedRepositoryImpl implements FeedRepository {
         topicId: topicId,
         source: source,
       );
+      final items = await _store.withLocalState(response.items);
       await _store.saveFeedSnapshot(
         key,
-        response.items,
+        items,
         nextCursor: response.nextCursor,
       );
       return PagedArticles(
-        items: response.items,
+        items: items,
         nextCursor: response.nextCursor,
         total: response.total,
       );
@@ -57,18 +58,21 @@ class FeedRepositoryImpl implements FeedRepository {
       source: source,
     );
 
+    final items = await _store.withLocalState(response.items);
     final key = filterKey(topicId: topicId, source: source);
     final snapshot = await _store.feedSnapshot(key);
     if (snapshot != null) {
       final seen = snapshot.articles.map((a) => a.id).toSet();
       await _store.saveFeedSnapshot(key, [
         ...snapshot.articles,
-        ...response.items.where((a) => !seen.contains(a.id)),
+        ...items.where((a) => !seen.contains(a.id)),
       ], nextCursor: response.nextCursor);
+    } else {
+      await _store.upsertArticles(items);
     }
 
     return PagedArticles(
-      items: response.items,
+      items: items,
       nextCursor: response.nextCursor,
       total: response.total,
     );
@@ -87,15 +91,16 @@ class FeedRepositoryImpl implements FeedRepository {
     }
 
     final head = await _api.getFeed(page: 1, topicId: topicId, source: source);
-    await _store.upsertArticles(head.items);
+    final items = await _store.withLocalState(head.items);
+    await _store.upsertArticles(items);
 
     final key = filterKey(topicId: topicId, source: source);
     final snapshot = await _store.feedSnapshot(key);
     if (snapshot != null) {
-      final headIds = head.items.map((a) => a.id).toSet();
+      final headIds = items.map((a) => a.id).toSet();
       final deleted = updates.deletedItems.toSet();
       await _store.saveFeedSnapshot(key, [
-        ...head.items,
+        ...items,
         ...snapshot.articles.where(
           (a) => !headIds.contains(a.id) && !deleted.contains(a.id),
         ),
@@ -104,7 +109,7 @@ class FeedRepositoryImpl implements FeedRepository {
 
     return FeedRefreshResult(
       head: PagedArticles(
-        items: head.items,
+        items: items,
         nextCursor: head.nextCursor,
         total: head.total,
       ),

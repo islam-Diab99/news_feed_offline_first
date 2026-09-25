@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../domain/entities/topic.dart';
 import '../blocs/search/search_bloc.dart';
 import '../widgets/feed_skeleton.dart';
 import '../widgets/offline_banner.dart';
@@ -70,6 +71,9 @@ class _SearchField extends StatelessWidget {
   }
 }
 
+/// Topics and sources are two different axes, so they get two rows instead of
+/// one long scroller: a single row buried every source chip off-screen to the
+/// right of the topic chips, where nobody found them.
 class _Filters extends StatelessWidget {
   const _Filters({required this.state});
 
@@ -80,38 +84,138 @@ class _Filters extends StatelessWidget {
     if (state.topics.isEmpty && state.sources.isEmpty) {
       return const SizedBox(height: 8);
     }
-    final bloc = context.read<SearchBloc>();
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (state.topics.isNotEmpty)
+          _TopicRow(topics: state.topics, topicId: state.topicId),
+        if (state.sources.isNotEmpty)
+          _SourceRow(
+            sources: state.sources,
+            source: state.source,
+            hasTopic: state.topicId != null,
+          ),
+      ],
+    );
+  }
+}
+
+class _TopicRow extends StatelessWidget {
+  const _TopicRow({required this.topics, required this.topicId});
+
+  final List<Topic> topics;
+  final String? topicId;
+
+  @override
+  Widget build(BuildContext context) {
     return SizedBox(
       height: 48,
-      child: ListView(
+      child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        children: [
-          for (final topic in state.topics) ...[
-            FilterChip(
-              label: Text(topic.name),
-              selected: state.topicId == topic.id,
-              onSelected: (selected) => bloc.add(
-                SearchTopicFilterChanged(selected ? topic.id : null),
+        itemCount: topics.length + 1,
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return FilterChip(
+              label: const Text('All'),
+              selected: topicId == null,
+              onSelected: (_) => context.read<SearchBloc>().add(
+                const SearchTopicFilterChanged(null),
               ),
+            );
+          }
+          final topic = topics[index - 1];
+          return FilterChip(
+            label: Text(topic.name),
+            selected: topicId == topic.id,
+            onSelected: (selected) => context.read<SearchBloc>().add(
+              SearchTopicFilterChanged(selected ? topic.id : null),
             ),
-            const SizedBox(width: 8),
-          ],
-          if (state.sources.isNotEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 4),
-              child: VerticalDivider(width: 8),
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// A menu rather than a chip strip: the unfiltered list is 15 sources wide,
+/// and only narrows to two or three once a topic is picked.
+class _SourceRow extends StatelessWidget {
+  const _SourceRow({
+    required this.sources,
+    required this.source,
+    required this.hasTopic,
+  });
+
+  final List<String> sources;
+  final String? source;
+  final bool hasTopic;
+
+  @override
+  Widget build(BuildContext context) {
+    final bloc = context.read<SearchBloc>();
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 8, 8),
+      child: Row(
+        children: [
+          Flexible(
+            child: MenuAnchor(
+              menuChildren: [
+                MenuItemButton(
+                  leadingIcon: Icon(
+                    Icons.check,
+                    size: 18,
+                    color: source == null ? null : Colors.transparent,
+                  ),
+                  onPressed: () =>
+                      bloc.add(const SearchSourceFilterChanged(null)),
+                  child: const Text('All sources'),
+                ),
+                for (final option in sources)
+                  MenuItemButton(
+                    leadingIcon: Icon(
+                      Icons.check,
+                      size: 18,
+                      color: source == option ? null : Colors.transparent,
+                    ),
+                    onPressed: () =>
+                        bloc.add(SearchSourceFilterChanged(option)),
+                    child: Text(option),
+                  ),
+              ],
+              builder: (context, controller, _) {
+                final selected = source != null;
+                return OutlinedButton.icon(
+                  onPressed: () =>
+                      controller.isOpen ? controller.close() : controller.open(),
+                  icon: const Icon(Icons.rss_feed, size: 18),
+                  label: Text(
+                    source ?? 'All sources',
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    foregroundColor: selected
+                        ? theme.colorScheme.onSecondaryContainer
+                        : null,
+                    backgroundColor: selected
+                        ? theme.colorScheme.secondaryContainer
+                        : null,
+                    side: selected
+                        ? BorderSide(color: theme.colorScheme.secondary)
+                        : null,
+                  ),
+                );
+              },
             ),
-          for (final source in state.sources) ...[
-            FilterChip(
-              avatar: const Icon(Icons.rss_feed, size: 16),
-              label: Text(source),
-              selected: state.source == source,
-              onSelected: (selected) =>
-                  bloc.add(SearchSourceFilterChanged(selected ? source : null)),
+          ),
+          if (hasTopic || source != null)
+            TextButton(
+              onPressed: () => bloc.add(const SearchFiltersCleared()),
+              child: const Text('Clear'),
             ),
-            const SizedBox(width: 8),
-          ],
         ],
       ),
     );

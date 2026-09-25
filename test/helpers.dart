@@ -119,10 +119,18 @@ class InMemoryLocalStore implements LocalStore {
 
   @override
   Future<void> upsertArticles(List<Article> items) async {
-    for (final article in items) {
+    for (final article in await withLocalState(items)) {
       articles[article.id] = article;
     }
   }
+
+  @override
+  Future<List<Article>> withLocalState(List<Article> items) async =>
+      applyLocalState(
+        items,
+        isBookmarked: bookmarks.containsKey,
+        pendingLikes: pendingLikesFrom(await pendingMutations()),
+      );
 
   @override
   Future<Article?> article(String id) async => articles[id];
@@ -157,8 +165,9 @@ class InMemoryLocalStore implements LocalStore {
   Future<void> removeBookmark(String id) async => bookmarks.remove(id);
 
   @override
-  Future<List<Article>> bookmarkedArticles() async =>
-      bookmarks.values.map((a) => articles[a.id] ?? a).toList();
+  Future<List<Article>> bookmarkedArticles() async => bookmarks.values
+      .map((a) => (articles[a.id] ?? a).copyWith(isBookmarked: true))
+      .toList();
 
   @override
   Future<bool> isBookmarked(String id) async => bookmarks.containsKey(id);
