@@ -38,6 +38,13 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
   final SearchRepository _search;
   late final StreamSubscription<ArticleUpdate> _busSubscription;
 
+ 
+  Future<void> refresh() {
+    final done = stream.firstWhere((s) => !s.isRefreshing);
+    add(const FeedRefreshRequested());
+    return done;
+  }
+
   Future<void> _onStarted(FeedStarted event, Emitter<FeedState> emit) async {
     emit(state.copyWith(status: FeedStatus.loading));
 

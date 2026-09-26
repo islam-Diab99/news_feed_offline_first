@@ -26,8 +26,6 @@ class PaginatedArticleList extends StatefulWidget {
 
   final ArticleListStatus status;
   final List<Article> articles;
-
-  /// Builders so the empty/error views are only constructed when shown.
   final WidgetBuilder emptyBuilder;
   final WidgetBuilder errorBuilder;
   final Widget loadingView;
@@ -47,20 +45,6 @@ class PaginatedArticleList extends StatefulWidget {
 }
 
 class _PaginatedArticleListState extends State<PaginatedArticleList> {
-  /// Returning the identical [ArticleCard] instance for an unchanged article
-  /// lets the framework skip rebuilding that row when the list re-renders
-  /// (e.g. a like on one article replaces the whole articles list).
-  final _cardCache = <String, ArticleCard>{};
-
-  @override
-  void didUpdateWidget(PaginatedArticleList oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (!identical(oldWidget.articles, widget.articles)) {
-      final ids = {for (final a in widget.articles) a.id};
-      _cardCache.removeWhere((id, _) => !ids.contains(id));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     switch (widget.status) {
@@ -75,25 +59,16 @@ class _PaginatedArticleListState extends State<PaginatedArticleList> {
   }
 
   Widget _card(BuildContext context, Article article) {
-    final topicName = widget.topicNames[article.topicId];
-    final cached = _cardCache[article.id];
-    if (cached != null &&
-        cached.article == article &&
-        cached.topicName == topicName) {
-      return cached;
-    }
-    final card = ArticleCard(
+    return ArticleCard(
       key: ValueKey(article.id),
       article: article,
-      topicName: topicName,
+      topicName: widget.topicNames[article.topicId],
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (_) => ArticleDetailPage(articleId: article.id),
         ),
       ),
     );
-    _cardCache[article.id] = card;
-    return card;
   }
 
   Widget _buildList(BuildContext context) {

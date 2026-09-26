@@ -41,9 +41,6 @@ class FeedPage extends StatelessWidget {
             ),
             Expanded(
               child: BlocBuilder<FeedBloc, FeedState>(
-                // notice/noticeId only feed the listener above, isRefreshing
-                // only feeds the onRefresh stream wait, and isStale/topics
-                // are rendered by the scoped builders above.
                 buildWhen: (previous, current) =>
                     previous.status != current.status ||
                     previous.articles != current.articles ||
@@ -130,12 +127,7 @@ class _FeedBody extends StatelessWidget {
         icon: Icons.newspaper_outlined,
       ),
       onLoadMore: () => bloc.add(const FeedNextPageRequested()),
-      onRefresh: () async {
-        bloc.add(const FeedRefreshRequested());
-        await bloc.stream
-            .firstWhere((s) => !s.isRefreshing)
-            .timeout(const Duration(seconds: 10), onTimeout: () => state);
-      },
+      onRefresh: bloc.refresh,
       isLoadingMore: state.isLoadingMore,
       hasMore: state.hasMore,
       loadMoreFailed: state.loadMoreFailed,
