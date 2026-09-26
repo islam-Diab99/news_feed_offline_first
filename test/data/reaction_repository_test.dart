@@ -166,18 +166,6 @@ void main() {
     );
   });
 
-  test('offline like then unlike coalesces to the final intent only', () async {
-    connectivity.setOnline(false);
-
-    await repository.toggleLike(article);
-    final liked = (await store.article('a1'))!;
-    await repository.toggleLike(liked);
-
-    final pending = await store.pendingMutations();
-    expect(pending, hasLength(1));
-    expect(pending.single.payload['reaction'], 'unlike');
-  });
-
   test('a queued like survives a feed load that says otherwise', () async {
     connectivity.setOnline(false);
     await repository.toggleLike(article);

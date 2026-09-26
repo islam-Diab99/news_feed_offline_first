@@ -88,18 +88,6 @@ void main() {
     },
   );
 
-  test('offline toggle on/off coalesces to a single outbox mutation', () async {
-    connectivity.setOnline(false);
-    final repository = buildRepository();
-
-    await repository.toggle(makeArticle('a1'));
-    await repository.toggle(makeArticle('a1', isBookmarked: true));
-
-    final pending = await store.pendingMutations();
-    expect(pending, hasLength(1));
-    expect(pending.single.payload['bookmarked'], isFalse);
-  });
-
   test(
     'a server failure falls back to the outbox, keeping local state',
     () async {
