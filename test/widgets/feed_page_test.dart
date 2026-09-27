@@ -5,10 +5,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:vlau_assessment/core/error/app_exception.dart';
-import 'package:vlau_assessment/domain/entities/paged_articles.dart';
+import 'package:vlau_assessment/domain/entities/article.dart';
 import 'package:vlau_assessment/domain/repositories/bookmark_repository.dart';
+import 'package:vlau_assessment/domain/repositories/feed_repository.dart';
 import 'package:vlau_assessment/domain/repositories/reaction_repository.dart';
-import 'package:vlau_assessment/domain/services/article_update_bus.dart';
 import 'package:vlau_assessment/presentation/blocs/connectivity/connectivity_cubit.dart';
 import 'package:vlau_assessment/presentation/blocs/engagement/engagement_bloc.dart';
 import 'package:vlau_assessment/presentation/blocs/feed/feed_bloc.dart';
@@ -25,21 +25,24 @@ class MockBookmarkRepository extends Mock implements BookmarkRepository {}
 void main() {
   late MockFeedRepository feedRepository;
   late MockSearchRepository searchRepository;
-  late ArticleUpdateBus bus;
   late FakeConnectivity connectivity;
 
   setUp(() {
     feedRepository = MockFeedRepository();
     searchRepository = MockSearchRepository();
-    bus = ArticleUpdateBus();
     connectivity = FakeConnectivity();
     when(() => searchRepository.topics()).thenAnswer((_) async => const []);
   });
 
   tearDown(() async {
-    await bus.dispose();
     await connectivity.dispose();
   });
+
+  void stubFeed(List<Article> articles) {
+    when(
+      () => feedRepository.watchFeed(topicId: any(named: 'topicId')),
+    ).thenAnswer((_) => Stream.value(articles));
+  }
 
   Widget buildSubject() {
     return MultiBlocProvider(
@@ -60,7 +63,6 @@ void main() {
           create: (_) => FeedBloc(
             feedRepository: feedRepository,
             searchRepository: searchRepository,
-            bus: bus,
           )..add(const FeedStarted()),
         ),
       ],
@@ -71,22 +73,18 @@ void main() {
   testWidgets(
     'primary transition: loading skeleton, then the loaded article list',
     (tester) async {
-      final gate = Completer<PagedArticles>();
+      final gate = Completer<FeedLoadResult>();
       when(
-        () => feedRepository.firstPage(topicId: any(named: 'topicId')),
+        () => feedRepository.loadFirstPage(topicId: any(named: 'topicId')),
       ).thenAnswer((_) => gate.future);
+      stubFeed([makeArticle('a1'), makeArticle('a2')]);
 
       await tester.pumpWidget(buildSubject());
       await tester.pump();
 
       expect(find.byType(FeedSkeleton), findsOneWidget);
 
-      gate.complete(
-        PagedArticles(
-          items: [makeArticle('a1'), makeArticle('a2')],
-          nextCursor: 'feed_2',
-        ),
-      );
+      gate.complete(const FeedLoadResult(hasMore: true));
       await tester.pump();
       await tester.pump();
 
@@ -101,11 +99,12 @@ void main() {
   ) async {
     var calls = 0;
     when(
-      () => feedRepository.firstPage(topicId: any(named: 'topicId')),
+      () => feedRepository.loadFirstPage(topicId: any(named: 'topicId')),
     ).thenAnswer((_) async {
       if (++calls == 1) throw const NetworkException();
-      return PagedArticles(items: [makeArticle('a1')]);
+      return const FeedLoadResult(hasMore: false);
     });
+    stubFeed([makeArticle('a1')]);
 
     await tester.pumpWidget(buildSubject());
     await tester.pump();
@@ -124,8 +123,9 @@ void main() {
 
   testWidgets('empty state is distinct from error and loading', (tester) async {
     when(
-      () => feedRepository.firstPage(topicId: any(named: 'topicId')),
-    ).thenAnswer((_) async => const PagedArticles(items: []));
+      () => feedRepository.loadFirstPage(topicId: any(named: 'topicId')),
+    ).thenAnswer((_) async => const FeedLoadResult(hasMore: false));
+    stubFeed(const []);
 
     await tester.pumpWidget(buildSubject());
     await tester.pump();

@@ -9,7 +9,7 @@ class FeedState extends Equatable {
     this.topics = const [],
     this.topicNames = const {},
     this.topicId,
-    this.nextCursor,
+    this.hasMore = false,
     this.isStale = false,
     this.isLoadingMore = false,
     this.loadMoreFailed = false,
@@ -27,7 +27,7 @@ class FeedState extends Equatable {
   /// instance instead of one rebuilt on every widget build.
   final Map<String, String> topicNames;
   final String? topicId;
-  final String? nextCursor;
+  final bool hasMore;
 
   final bool isStale;
 
@@ -41,7 +41,6 @@ class FeedState extends Equatable {
   final String? notice;
   final int noticeId;
 
-  bool get hasMore => nextCursor != null;
   bool get isEmpty => status == FeedStatus.success && articles.isEmpty;
 
   FeedState copyWith({
@@ -49,7 +48,7 @@ class FeedState extends Equatable {
     List<Article>? articles,
     List<Topic>? topics,
     Object? topicId = _unset,
-    Object? nextCursor = _unset,
+    bool? hasMore,
     bool? isStale,
     bool? isLoadingMore,
     bool? loadMoreFailed,
@@ -65,9 +64,7 @@ class FeedState extends Equatable {
           ? topicNames
           : {for (final t in topics) t.id: t.name},
       topicId: topicId == _unset ? this.topicId : topicId as String?,
-      nextCursor: nextCursor == _unset
-          ? this.nextCursor
-          : nextCursor as String?,
+      hasMore: hasMore ?? this.hasMore,
       isStale: isStale ?? this.isStale,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       loadMoreFailed: loadMoreFailed ?? this.loadMoreFailed,
@@ -86,7 +83,7 @@ class FeedState extends Equatable {
     articles,
     topics,
     topicId,
-    nextCursor,
+    hasMore,
     isStale,
     isLoadingMore,
     loadMoreFailed,

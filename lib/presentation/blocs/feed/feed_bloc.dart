@@ -6,11 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/error/app_exception.dart';
 import '../../../domain/entities/article.dart';
-import '../../../domain/entities/article_update.dart';
 import '../../../domain/entities/topic.dart';
 import '../../../domain/repositories/feed_repository.dart';
 import '../../../domain/repositories/search_repository.dart';
-import '../../../domain/services/article_update_bus.dart';
 
 part 'feed_event.dart';
 part 'feed_state.dart';
@@ -19,32 +17,27 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
   FeedBloc({
     required FeedRepository feedRepository,
     required SearchRepository searchRepository,
-    required ArticleUpdateBus bus,
   }) : _feed = feedRepository,
        _search = searchRepository,
        super(const FeedState()) {
     on<FeedStarted>(_onStarted, transformer: restartable());
-    on<FeedTopicSelected>(_onTopicSelected, transformer: restartable());
+    on<FeedTopicSelected>(_onTopicSelected);
     on<FeedNextPageRequested>(_onNextPage, transformer: droppable());
     on<FeedRefreshRequested>(_onRefresh, transformer: droppable());
-    on<_FeedArticleUpdated>(_onArticleUpdated, transformer: sequential());
-
-    _busSubscription = bus.stream.listen(
-      (update) => add(_FeedArticleUpdated(update)),
-    );
   }
 
   final FeedRepository _feed;
   final SearchRepository _search;
-  late final StreamSubscription<ArticleUpdate> _busSubscription;
 
- 
   Future<void> refresh() {
     final done = stream.firstWhere((s) => !s.isRefreshing);
     add(const FeedRefreshRequested());
     return done;
   }
 
+  /// Loads page 1, then follows the stored feed for as long as this filter is
+  /// active. Every later write — pages, refreshes, likes, bookmarks, sync —
+  /// reaches the list through that one subscription.
   Future<void> _onStarted(FeedStarted event, Emitter<FeedState> emit) async {
     emit(state.copyWith(status: FeedStatus.loading));
 
@@ -57,19 +50,10 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
       }
     }
 
+    final topicId = state.topicId;
+    final FeedLoadResult result;
     try {
-      final page = await _feed.firstPage(topicId: state.topicId);
-      emit(
-        state.copyWith(
-          status: FeedStatus.success,
-          articles: page.items,
-          topics: topics,
-          nextCursor: page.nextCursor,
-          isStale: page.isStale,
-          isLoadingMore: false,
-          loadMoreFailed: false,
-        ),
-      );
+      result = await _feed.loadFirstPage(topicId: topicId);
     } on AppException catch (e) {
       emit(
         state.copyWith(
@@ -80,45 +64,50 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
               : e.message,
         ),
       );
+      return;
     }
+
+    emit(
+      state.copyWith(
+        topics: topics,
+        hasMore: result.hasMore,
+        isStale: result.isStale,
+        isLoadingMore: false,
+        loadMoreFailed: false,
+      ),
+    );
+    await emit.forEach<List<Article>>(
+      _feed.watchFeed(topicId: topicId),
+      onData: (articles) => state.topicId != topicId
+          ? state
+          : state.copyWith(status: FeedStatus.success, articles: articles),
+    );
   }
 
-  Future<void> _onTopicSelected(
-    FeedTopicSelected event,
-    Emitter<FeedState> emit,
-  ) async {
+  void _onTopicSelected(FeedTopicSelected event, Emitter<FeedState> emit) {
     if (event.topicId == state.topicId) return;
     emit(
       state.copyWith(
         topicId: event.topicId,
         articles: const [],
-        nextCursor: null,
+        hasMore: false,
       ),
     );
-    await _onStarted(const FeedStarted(), emit);
+    add(const FeedStarted());
   }
 
   Future<void> _onNextPage(
     FeedNextPageRequested event,
     Emitter<FeedState> emit,
   ) async {
-    final cursor = state.nextCursor;
-    if (cursor == null || state.status != FeedStatus.success) return;
+    if (!state.hasMore || state.status != FeedStatus.success) return;
 
+    final topicId = state.topicId;
     emit(state.copyWith(isLoadingMore: true, loadMoreFailed: false));
     try {
-      final page = await _feed.nextPage(cursor, topicId: state.topicId);
-      final seen = state.articles.map((a) => a.id).toSet();
-      emit(
-        state.copyWith(
-          articles: [
-            ...state.articles,
-            ...page.items.where((a) => !seen.contains(a.id)),
-          ],
-          nextCursor: page.nextCursor,
-          isLoadingMore: false,
-        ),
-      );
+      final result = await _feed.loadNextPage(topicId: topicId);
+      if (state.topicId != topicId) return;
+      emit(state.copyWith(hasMore: result.hasMore, isLoadingMore: false));
     } on AppException {
       emit(state.copyWith(isLoadingMore: false, loadMoreFailed: true));
     }
@@ -128,33 +117,19 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
     FeedRefreshRequested event,
     Emitter<FeedState> emit,
   ) async {
+    if (state.status != FeedStatus.success) {
+      add(const FeedStarted());
+      return;
+    }
     emit(state.copyWith(isRefreshing: true));
     try {
-      if (state.status != FeedStatus.success) {
-        return await _onStarted(const FeedStarted(), emit);
-      }
       final result = await _feed.refresh(topicId: state.topicId);
-      final head = result.head;
-      final headIds = head.items.map((a) => a.id).toSet();
-      final deleted = result.deletedIds.toSet();
-
-      final existingIds = state.articles.map((a) => a.id).toSet();
-      final newCount = head.items
-          .where((a) => !existingIds.contains(a.id))
-          .length;
-
+      final count = result.newStories;
       emit(
         state.copyWith(
-          articles: [
-            ...head.items,
-            ...state.articles.where(
-              (a) => !headIds.contains(a.id) && !deleted.contains(a.id),
-            ),
-          ],
-          nextCursor: state.nextCursor ?? head.nextCursor,
           isStale: false,
-          notice: newCount > 0
-              ? '$newCount new ${newCount == 1 ? 'story' : 'stories'}'
+          notice: count > 0
+              ? '$count new ${count == 1 ? 'story' : 'stories'}'
               : null,
         ),
       );
@@ -170,27 +145,5 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
     } finally {
       emit(state.copyWith(isRefreshing: false));
     }
-  }
-
-  void _onArticleUpdated(_FeedArticleUpdated event, Emitter<FeedState> emit) {
-    switch (event.update) {
-      case ArticleChanged(:final article):
-        final index = state.articles.indexWhere((a) => a.id == article.id);
-        if (index == -1) return;
-        final articles = [...state.articles]..[index] = article;
-        emit(state.copyWith(articles: articles));
-      case ArticleRemoved(:final articleId):
-        final articles = state.articles
-            .where((a) => a.id != articleId)
-            .toList();
-        if (articles.length == state.articles.length) return;
-        emit(state.copyWith(articles: articles));
-    }
-  }
-
-  @override
-  Future<void> close() async {
-    await _busSubscription.cancel();
-    return super.close();
   }
 }

@@ -26,25 +26,12 @@ class ArticleDetailLoaded extends ArticleDetailState {
   final List<Article> related;
   final bool isStale;
 
-  ArticleDetailLoaded copyWith({
-    ArticleDetail? detail,
-    List<Article>? related,
-  }) => ArticleDetailLoaded(
-    detail: detail ?? this.detail,
-    related: related ?? this.related,
-    isStale: isStale,
-  );
-
   @override
   List<Object?> get props => [detail, related, isStale];
 }
 
 class ArticleDetailGone extends ArticleDetailState {
-  const ArticleDetailGone({this.reason});
-  final String? reason;
-
-  @override
-  List<Object?> get props => [reason];
+  const ArticleDetailGone();
 }
 
 class ArticleDetailError extends ArticleDetailState {

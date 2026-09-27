@@ -3,131 +3,132 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:vlau_assessment/core/error/app_exception.dart';
+import 'package:vlau_assessment/data/datasources/local/app_database.dart';
 import 'package:vlau_assessment/data/datasources/remote/api_client.dart';
 import 'package:vlau_assessment/data/models/outbox_mutation.dart';
 import 'package:vlau_assessment/data/repositories/feed_repository_impl.dart';
 import 'package:vlau_assessment/data/repositories/reaction_repository_impl.dart';
 import 'package:vlau_assessment/data/services/outbox_sync_service.dart';
-import 'package:vlau_assessment/domain/entities/article_update.dart';
-import 'package:vlau_assessment/domain/services/article_update_bus.dart';
+import 'package:vlau_assessment/domain/entities/article.dart';
 
 import '../helpers.dart';
 
 void main() {
   late MockApi api;
-  late InMemoryLocalStore store;
+  late AppDatabase db;
   late FakeConnectivity connectivity;
-  late ArticleUpdateBus bus;
   late ReactionRepositoryImpl repository;
 
   final article = makeArticle('a1', likes: 10, isLiked: false, version: 3);
 
+  Future<Article> stored() async => (await db.articleDao.article('a1'))!;
+
+  When<Future<ReactionResponse>> whenReaction() => when(
+    () => api.setReaction(
+      any(),
+      liked: any(named: 'liked'),
+      clientMutationId: any(named: 'clientMutationId'),
+      expectedVersion: any(named: 'expectedVersion'),
+    ),
+  );
+
   setUpAll(() => registerFallbackValue(<OutboxMutation>[]));
 
-  setUp(() {
+  setUp(() async {
     api = MockApi();
-    store = InMemoryLocalStore();
+    db = memoryDatabase();
     connectivity = FakeConnectivity();
-    bus = ArticleUpdateBus();
     repository = ReactionRepositoryImpl(
       api: api,
-      store: store,
+      db: db,
       connectivity: connectivity,
-      bus: bus,
     );
+    await db.articleDao.saveServerArticles([article]);
   });
 
   tearDown(() async {
-    await bus.dispose();
+    await db.close();
     await connectivity.dispose();
   });
 
-  void stubReaction(FutureOr<ReactionResponse> Function() respond) {
-    when(
-      () => api.setReaction(
-        any(),
-        liked: any(named: 'liked'),
-        clientMutationId: any(named: 'clientMutationId'),
-        expectedVersion: any(named: 'expectedVersion'),
-      ),
-    ).thenAnswer((_) async => respond());
-  }
-
   test(
-    'optimistic like is applied immediately, then confirmed by the server',
-    () async {
-      stubReaction(() => const ReactionSuccess(likes: 11, version: 4));
-      final updates = <ArticleUpdate>[];
-      final subscription = bus.stream.listen(updates.add);
-
-      await repository.toggleLike(article);
-      await Future<void>.delayed(Duration.zero);
-
-      expect(updates, hasLength(2));
-      final optimistic = (updates[0] as ArticleChanged).article;
-      expect(optimistic.isLiked, isTrue);
-      expect(optimistic.likes, 11);
-
-      final confirmed = (updates[1] as ArticleChanged).article;
-      expect(confirmed.version, 4);
-
-      await subscription.cancel();
-    },
-  );
-
-  test('rollback: a failed request reverts the optimistic state', () async {
-    stubReaction(() => throw const ServerException('Reaction was not saved.'));
-    final updates = <ArticleUpdate>[];
-    final subscription = bus.stream.listen(updates.add);
-
-    await expectLater(
-      repository.toggleLike(article),
-      throwsA(isA<ServerException>()),
-    );
-    await Future<void>.delayed(Duration.zero);
-
-    expect(updates, hasLength(2));
-    final optimistic = (updates[0] as ArticleChanged).article;
-    expect(optimistic.isLiked, isTrue);
-    expect(optimistic.likes, 11);
-
-    final rolledBack = (updates[1] as ArticleChanged).article;
-    expect(rolledBack.isLiked, isFalse);
-    expect(rolledBack.likes, 10);
-    expect((await store.article('a1'))!.isLiked, isFalse);
-
-    await subscription.cancel();
-  });
-
-  test('conflict: the server state wins over the optimistic guess', () async {
-    stubReaction(
-      () => const ReactionConflict(isLiked: true, likes: 186, version: 5),
-    );
-    final updates = <ArticleUpdate>[];
-    final subscription = bus.stream.listen(updates.add);
-
-    await repository.toggleLike(article);
-    await Future<void>.delayed(Duration.zero);
-
-    final reconciled = (updates.last as ArticleChanged).article;
-    expect(reconciled.likes, 186);
-    expect(reconciled.version, 5);
-
-    await subscription.cancel();
-  });
-
-  test(
-    'duplicate submissions are ignored while a request is in flight',
+    'optimistic like shows before the server answers, then is confirmed',
     () async {
       final gate = Completer<ReactionResponse>();
-      when(
+      whenReaction().thenAnswer((_) => gate.future);
+
+      final toggle = repository.toggleLike(article);
+      await untilCalled(
         () => api.setReaction(
           any(),
           liked: any(named: 'liked'),
           clientMutationId: any(named: 'clientMutationId'),
           expectedVersion: any(named: 'expectedVersion'),
         ),
-      ).thenAnswer((_) => gate.future);
+      );
+      expect((await stored()).isLiked, isTrue);
+      expect((await stored()).likes, 11);
+
+      gate.complete(const ReactionSuccess(likes: 11, version: 4));
+      await toggle;
+
+      final confirmed = await stored();
+      expect(confirmed.isLiked, isTrue);
+      expect(confirmed.likes, 11);
+      expect(confirmed.version, 4);
+      expect(await db.outboxDao.pending(), isEmpty);
+    },
+  );
+
+  test('rollback: a failed request reverts the optimistic state', () async {
+    whenReaction().thenThrow(const ServerException('Reaction was not saved.'));
+
+    await expectLater(
+      repository.toggleLike(article),
+      throwsA(isA<ServerException>()),
+    );
+
+    final rolledBack = await stored();
+    expect(rolledBack.isLiked, isFalse);
+    expect(rolledBack.likes, 10);
+    expect(await db.outboxDao.pending(), isEmpty);
+  });
+
+  test('rollback restores an intent that was already queued', () async {
+    connectivity.setOnline(false);
+    await repository.toggleLike(article);
+
+    connectivity.setOnline(true);
+    whenReaction().thenThrow(const ServerException());
+    await expectLater(
+      repository.toggleLike(await stored()),
+      throwsA(isA<ServerException>()),
+    );
+
+    expect((await stored()).isLiked, isTrue);
+    final pending = await db.outboxDao.pending();
+    expect(pending.single.value, isTrue);
+  });
+
+  test('conflict: the server state wins over the optimistic guess', () async {
+    whenReaction().thenAnswer(
+      (_) async =>
+          const ReactionConflict(isLiked: true, likes: 186, version: 5),
+    );
+
+    await repository.toggleLike(article);
+
+    final reconciled = await stored();
+    expect(reconciled.isLiked, isTrue);
+    expect(reconciled.likes, 186);
+    expect(reconciled.version, 5);
+  });
+
+  test(
+    'duplicate submissions are ignored while a request is in flight',
+    () async {
+      final gate = Completer<ReactionResponse>();
+      whenReaction().thenAnswer((_) => gate.future);
 
       final first = repository.toggleLike(article);
       final second = repository.toggleLike(article);
@@ -151,11 +152,11 @@ void main() {
 
     await repository.toggleLike(article);
 
-    expect((await store.article('a1'))!.isLiked, isTrue);
-    final pending = await store.pendingMutations();
-    expect(pending, hasLength(1));
-    expect(pending.single.op, OutboxMutation.opSetReaction);
-    expect(pending.single.payload['reaction'], 'like');
+    expect((await stored()).isLiked, isTrue);
+    expect((await stored()).likes, 11);
+    final pending = await db.outboxDao.pending();
+    expect(pending.single.kind, MutationKind.reaction);
+    expect(pending.single.value, isTrue);
     verifyNever(
       () => api.setReaction(
         any(),
@@ -166,55 +167,97 @@ void main() {
     );
   });
 
+  test('a connection drop mid-request keeps the like queued', () async {
+    whenReaction().thenThrow(const NetworkException());
+
+    await repository.toggleLike(article);
+
+    expect((await stored()).isLiked, isTrue);
+    expect(await db.outboxDao.pending(), hasLength(1));
+  });
+
   test('a queued like survives a feed load that says otherwise', () async {
     connectivity.setOnline(false);
     await repository.toggleLike(article);
 
-    // Back online, fresh launch: the server has no record of the like yet.
     connectivity.setOnline(true);
     when(() => api.getFeed(page: 1, topicId: null, source: null)).thenAnswer(
       (_) async => FeedPageResponse(
-        items: [makeArticle('a1', likes: 10, isLiked: false)],
+        items: [makeArticle('a1', likes: 10, isLiked: false, version: 3)],
         page: 1,
         total: 1,
       ),
     );
+    final feed = FeedRepositoryImpl(api: api, db: db);
+    await feed.loadFirstPage();
 
-    final page = await FeedRepositoryImpl(api: api, store: store).firstPage();
-
-    expect(page.items.single.isLiked, isTrue);
-    expect(page.items.single.likes, 11);
+    final item = (await feed.watchFeed().first).single;
+    expect(item.isLiked, isTrue);
+    expect(item.likes, 11);
   });
 
-  test('a settled sync republishes the article to the UI', () async {
-    connectivity.setOnline(false);
-    await repository.toggleLike(article);
-    final queued = (await store.pendingMutations()).single;
+  group('outbox sync', () {
+    late OutboxSyncService sync;
 
-    connectivity.setOnline(true);
-    when(() => api.sync(any())).thenAnswer(
-      (_) async => SyncResponse(applied: [queued.idempotencyKey]),
-    );
+    setUp(() {
+      sync = OutboxSyncService(api: api, db: db, connectivity: connectivity);
+    });
 
-    final updates = <ArticleUpdate>[];
-    final subscription = bus.stream.listen(updates.add);
-    final sync = OutboxSyncService(
-      api: api,
-      store: store,
-      connectivity: connectivity,
-      bus: bus,
-    );
+    tearDown(() => sync.dispose());
 
-    await sync.syncNow();
-    await Future<void>.delayed(Duration.zero);
+    test('an applied reaction becomes the stored server state', () async {
+      connectivity.setOnline(false);
+      await repository.toggleLike(article);
+      final queued = (await db.outboxDao.pending()).single;
 
-    final published = updates.whereType<ArticleChanged>().last.article;
-    expect(published.id, 'a1');
-    expect(published.isLiked, isTrue);
-    expect(published.likes, 11);
-    expect(await store.pendingMutations(), isEmpty);
+      connectivity.setOnline(true);
+      when(
+        () => api.sync(any()),
+      ).thenAnswer((_) async => SyncResponse(applied: [queued.idempotencyKey]));
+      await sync.syncNow();
 
-    await subscription.cancel();
-    await sync.dispose();
+      expect(await db.outboxDao.pending(), isEmpty);
+      final synced = await stored();
+      expect(synced.isLiked, isTrue);
+      expect(synced.likes, 11);
+    });
+
+    test('a conflicting reaction adopts the server article', () async {
+      connectivity.setOnline(false);
+      await repository.toggleLike(article);
+      final queued = (await db.outboxDao.pending()).single;
+
+      connectivity.setOnline(true);
+      when(() => api.sync(any())).thenAnswer(
+        (_) async => SyncResponse(
+          applied: [queued.idempotencyKey],
+          conflicts: [makeArticle('a1', likes: 40, isLiked: true, version: 6)],
+        ),
+      );
+      await sync.syncNow();
+
+      final synced = await stored();
+      expect(synced.likes, 40);
+      expect(synced.version, 6);
+      expect(await db.outboxDao.pending(), isEmpty);
+    });
+
+    test('a toggle made while syncing is not lost', () async {
+      connectivity.setOnline(false);
+      await repository.toggleLike(article);
+      final queued = (await db.outboxDao.pending()).single;
+
+      connectivity.setOnline(true);
+      when(() => api.sync(any())).thenAnswer((_) async {
+        connectivity.setOnline(false);
+        await repository.toggleLike(await stored());
+        return SyncResponse(applied: [queued.idempotencyKey]);
+      });
+      await sync.syncNow();
+
+      final pending = await db.outboxDao.pending();
+      expect(pending.single.value, isFalse);
+      expect((await stored()).isLiked, isFalse);
+    });
   });
 }

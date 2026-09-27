@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,10 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/error/app_exception.dart';
 import '../../../core/utils/bloc_transformers.dart';
 import '../../../domain/entities/article.dart';
-import '../../../domain/entities/article_update.dart';
 import '../../../domain/entities/topic.dart';
+import '../../../domain/repositories/article_repository.dart';
 import '../../../domain/repositories/search_repository.dart';
-import '../../../domain/services/article_update_bus.dart';
 
 part 'search_event.dart';
 part 'search_state.dart';
@@ -18,9 +15,10 @@ part 'search_state.dart';
 class SearchBloc extends Bloc<SearchEvent, SearchState> {
   SearchBloc({
     required SearchRepository searchRepository,
-    required ArticleUpdateBus bus,
+    required ArticleRepository articleRepository,
     Duration debounce = const Duration(milliseconds: 400),
   }) : _repository = searchRepository,
+       _articles = articleRepository,
        super(const SearchState()) {
     on<SearchStarted>(_onStarted);
     on<SearchQueryChanged>(
@@ -32,15 +30,15 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     on<SearchFiltersCleared>(_onFiltersCleared, transformer: restartable());
     on<SearchRetryRequested>(_onRetry, transformer: restartable());
     on<SearchNextPageRequested>(_onNextPage, transformer: droppable());
-    on<_SearchArticleUpdated>(_onArticleUpdated, transformer: sequential());
-
-    _busSubscription = bus.stream.listen(
-      (update) => add(_SearchArticleUpdated(update)),
-    );
+    on<_SearchResultsShown>(_onResultsShown, transformer: restartable());
   }
 
   final SearchRepository _repository;
-  late final StreamSubscription<ArticleUpdate> _busSubscription;
+  final ArticleRepository _articles;
+
+  /// Bumped whenever a new result list is shown, so a watcher still bound to
+  /// an older list can never write its rows back over the newer one.
+  int _resultsGeneration = 0;
 
   Future<void> _onStarted(
     SearchStarted event,
@@ -59,7 +57,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   ) async {
     final query = event.query.trim();
     if (query.isEmpty) {
-      emit(
+      _showResults(
+        emit,
         state.copyWith(
           status: SearchStatus.idle,
           query: '',
@@ -135,7 +134,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         topicId: state.topicId,
         source: state.source,
       );
-      emit(
+      _showResults(
+        emit,
         state.copyWith(
           status: SearchStatus.success,
           results: page.items,
@@ -171,7 +171,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         page: nextPage,
       );
       final seen = state.results.map((a) => a.id).toSet();
-      emit(
+      _showResults(
+        emit,
         state.copyWith(
           results: [
             ...state.results,
@@ -186,26 +187,26 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     }
   }
 
-  void _onArticleUpdated(
-    _SearchArticleUpdated event,
-    Emitter<SearchState> emit,
-  ) {
-    switch (event.update) {
-      case ArticleChanged(:final article):
-        final index = state.results.indexWhere((a) => a.id == article.id);
-        if (index == -1) return;
-        final results = [...state.results]..[index] = article;
-        emit(state.copyWith(results: results));
-      case ArticleRemoved(:final articleId):
-        final results = state.results.where((a) => a.id != articleId).toList();
-        if (results.length == state.results.length) return;
-        emit(state.copyWith(results: results));
-    }
+  void _showResults(Emitter<SearchState> emit, SearchState next) {
+    if (emit.isDone) return;
+    emit(next);
+    add(
+      _SearchResultsShown(++_resultsGeneration, [
+        for (final a in next.results) a.id,
+      ]),
+    );
   }
 
-  @override
-  Future<void> close() async {
-    await _busSubscription.cancel();
-    return super.close();
+  Future<void> _onResultsShown(
+    _SearchResultsShown event,
+    Emitter<SearchState> emit,
+  ) async {
+    if (event.ids.isEmpty) return;
+    await emit.forEach<List<Article>>(
+      _articles.watchArticles(event.ids),
+      onData: (results) => event.generation == _resultsGeneration
+          ? state.copyWith(results: results)
+          : state,
+    );
   }
 }

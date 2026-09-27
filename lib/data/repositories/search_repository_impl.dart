@@ -2,16 +2,16 @@ import '../../core/error/app_exception.dart';
 import '../../domain/entities/paged_articles.dart';
 import '../../domain/entities/topic.dart';
 import '../../domain/repositories/search_repository.dart';
-import '../datasources/local/local_store.dart';
+import '../datasources/local/app_database.dart';
 import '../datasources/remote/api_client.dart';
 
 class SearchRepositoryImpl implements SearchRepository {
-  SearchRepositoryImpl({required ApiClient api, required LocalStore store})
+  SearchRepositoryImpl({required ApiClient api, required AppDatabase db})
     : _api = api,
-      _store = store;
+      _db = db;
 
   final ApiClient _api;
-  final LocalStore _store;
+  final AppDatabase _db;
 
   List<Topic>? _topics;
   final Map<String, List<String>> _sources = {};
@@ -30,27 +30,20 @@ class SearchRepositoryImpl implements SearchRepository {
         topicId: topicId,
         source: source,
       );
-      final items = await _store.withLocalState(response.items);
-      await _store.upsertArticles(items);
+      await _db.articleDao.saveServerArticles(response.items);
       return PagedArticles(
-        items: items,
+        items: await _db.articleDao.articlesById(
+          response.items.map((a) => a.id).toList(),
+        ),
         nextCursor: response.nextCursor,
         total: response.total,
       );
     } on NetworkException {
-      final needle = query.trim().toLowerCase();
-      final hits =
-          (await _store.allArticles())
-              .where((a) => topicId == null || a.topicId == topicId)
-              .where((a) => source == null || a.source == source)
-              .where(
-                (a) =>
-                    a.title.toLowerCase().contains(needle) ||
-                    a.summary.toLowerCase().contains(needle) ||
-                    a.tags.any((t) => t.toLowerCase().contains(needle)),
-              )
-              .toList()
-            ..sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
+      final hits = await _db.articleDao.searchCached(
+        query,
+        topicId: topicId,
+        source: source,
+      );
       return PagedArticles(items: hits, total: hits.length, isStale: true);
     }
   }

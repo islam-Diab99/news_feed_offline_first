@@ -1,104 +1,76 @@
-import 'package:uuid/uuid.dart';
-
 import '../../core/error/app_exception.dart';
 import '../../core/network/connectivity_service.dart';
 import '../../domain/entities/article.dart';
-import '../../domain/entities/article_update.dart';
 import '../../domain/repositories/reaction_repository.dart';
-import '../../domain/services/article_update_bus.dart';
-import '../datasources/local/local_store.dart';
+import '../datasources/local/app_database.dart';
 import '../datasources/remote/api_client.dart';
-import '../models/outbox_mutation.dart';
+
 
 class ReactionRepositoryImpl implements ReactionRepository {
   ReactionRepositoryImpl({
     required ApiClient api,
-    required LocalStore store,
+    required AppDatabase db,
     required ConnectivityService connectivity,
-    required ArticleUpdateBus bus,
-    Uuid uuid = const Uuid(),
   }) : _api = api,
-       _store = store,
-       _connectivity = connectivity,
-       _bus = bus,
-       _uuid = uuid;
+       _db = db,
+       _connectivity = connectivity;
 
   final ApiClient _api;
-  final LocalStore _store;
+  final AppDatabase _db;
   final ConnectivityService _connectivity;
-  final ArticleUpdateBus _bus;
-  final Uuid _uuid;
 
   final _inFlight = <String>{};
 
   @override
   Future<void> toggleLike(Article article) async {
-    if (_inFlight.contains(article.id)) return;
-    _inFlight.add(article.id);
-
-    final liked = !article.isLiked;
-    final optimistic = article.copyWith(
-      isLiked: liked,
-      likes: article.likes + (liked ? 1 : -1),
-    );
-    await _commit(optimistic);
-
+    if (!_inFlight.add(article.id)) return;
     try {
-      if (!_connectivity.isOnline) {
-        await _enqueue(article.id, liked);
-        return;
-      }
-
-      final response = await _api.setReaction(
+      final liked = !article.isLiked;
+      final queued = await _db.outboxDao.put(
+        MutationKind.reaction,
         article.id,
-        liked: liked,
-        clientMutationId: _uuid.v4(),
-        expectedVersion: article.version,
+        liked,
       );
+      if (!_connectivity.isOnline) return;
 
-      switch (response) {
-        case ReactionSuccess(:final likes, :final version):
-          await _commit(optimistic.copyWith(likes: likes, version: version));
-        case ReactionConflict(:final isLiked, :final likes, :final version):
-          await _commit(
-            article.copyWith(isLiked: isLiked, likes: likes, version: version),
-          );
+      final ReactionResponse response;
+      try {
+        response = await _api.setReaction(
+          article.id,
+          liked: liked,
+          clientMutationId: queued.key,
+          expectedVersion: article.version,
+        );
+      } on NetworkException {
+        return;
+      } on AppException {
+        await _db.outboxDao.revert(queued);
+        rethrow;
       }
-    } on NetworkException {
-      await _enqueue(article.id, liked);
-    } on AppException {
-      await _commit(article);
-      rethrow;
+
+      final (isLiked, likes, version) = switch (response) {
+        ReactionSuccess(:final likes, :final version) => (
+          liked,
+          likes,
+          version,
+        ),
+        ReactionConflict(:final isLiked, :final likes, :final version) => (
+          isLiked,
+          likes,
+          version,
+        ),
+      };
+      await _db.transaction(() async {
+        await _db.articleDao.setServerReaction(
+          article.id,
+          isLiked: isLiked,
+          likes: likes,
+          version: version,
+        );
+        await _db.outboxDao.settle([queued.key]);
+      });
     } finally {
       _inFlight.remove(article.id);
     }
-  }
-
-  Future<void> _commit(Article article) async {
-    await _store.upsertArticles([article]);
-    _bus.publish(ArticleChanged(article));
-  }
-
-  Future<void> _enqueue(String articleId, bool liked) async {
-    final stale = (await _store.pendingMutations())
-        .where(
-          (m) =>
-              m.op == OutboxMutation.opSetReaction && m.articleId == articleId,
-        )
-        .map((m) => m.idempotencyKey);
-    await _store.removeMutations(stale);
-
-    await _store.enqueueMutation(
-      OutboxMutation(
-        idempotencyKey: _uuid.v4(),
-        op: OutboxMutation.opSetReaction,
-        articleId: articleId,
-        payload: {
-          'articleId': articleId,
-          'reaction': liked ? 'like' : 'unlike',
-        },
-        queuedAt: DateTime.now(),
-      ),
-    );
   }
 }

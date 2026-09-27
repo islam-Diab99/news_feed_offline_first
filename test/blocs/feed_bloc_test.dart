@@ -1,10 +1,11 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:vlau_assessment/core/error/app_exception.dart';
-import 'package:vlau_assessment/domain/entities/paged_articles.dart';
+import 'package:vlau_assessment/domain/entities/article.dart';
 import 'package:vlau_assessment/domain/repositories/feed_repository.dart';
-import 'package:vlau_assessment/domain/services/article_update_bus.dart';
 import 'package:vlau_assessment/presentation/blocs/feed/feed_bloc.dart';
 
 import '../helpers.dart';
@@ -12,50 +13,51 @@ import '../helpers.dart';
 void main() {
   late MockFeedRepository feedRepository;
   late MockSearchRepository searchRepository;
-  late ArticleUpdateBus bus;
-
-  final page1 = PagedArticles(
-    items: [makeArticle('a1'), makeArticle('a2')],
-    nextCursor: 'feed_2',
-    total: 4,
-  );
-  final page2 = PagedArticles(
-    items: [makeArticle('a2'), makeArticle('a3')],
-    nextCursor: null,
-    total: 4,
-  );
+  late StreamController<List<Article>> feed;
 
   setUp(() {
     feedRepository = MockFeedRepository();
     searchRepository = MockSearchRepository();
-    bus = ArticleUpdateBus();
+    feed = StreamController<List<Article>>.broadcast();
     when(() => searchRepository.topics()).thenAnswer((_) async => const []);
+    when(
+      () => feedRepository.watchFeed(topicId: any(named: 'topicId')),
+    ).thenAnswer((_) => feed.stream);
   });
 
-  tearDown(() => bus.dispose());
+  tearDown(() => feed.close());
 
   FeedBloc buildBloc() => FeedBloc(
     feedRepository: feedRepository,
     searchRepository: searchRepository,
-    bus: bus,
+  );
+
+  final loaded = FeedState(
+    status: FeedStatus.success,
+    articles: [makeArticle('a1'), makeArticle('a2')],
+    hasMore: true,
   );
 
   group('initial load', () {
     blocTest<FeedBloc, FeedState>(
-      'emits [loading, success] with the first page',
+      'loads page 1, then shows the stored feed',
       build: () {
         when(
-          () => feedRepository.firstPage(topicId: any(named: 'topicId')),
-        ).thenAnswer((_) async => page1);
+          () => feedRepository.loadFirstPage(topicId: any(named: 'topicId')),
+        ).thenAnswer((_) async => const FeedLoadResult(hasMore: true));
         return buildBloc();
       },
-      act: (bloc) => bloc.add(const FeedStarted()),
+      act: (bloc) async {
+        bloc.add(const FeedStarted());
+        await pumpEventQueue();
+        feed.add([makeArticle('a1'), makeArticle('a2')]);
+      },
       expect: () => [
         const FeedState(status: FeedStatus.loading),
+        isA<FeedState>().having((s) => s.hasMore, 'hasMore', true),
         isA<FeedState>()
             .having((s) => s.status, 'status', FeedStatus.success)
-            .having((s) => s.articles.map((a) => a.id), 'ids', ['a1', 'a2'])
-            .having((s) => s.nextCursor, 'nextCursor', 'feed_2'),
+            .having((s) => s.articles.map((a) => a.id), 'ids', ['a1', 'a2']),
       ],
     );
 
@@ -63,7 +65,7 @@ void main() {
       'emits [loading, failure] when nothing can be loaded',
       build: () {
         when(
-          () => feedRepository.firstPage(topicId: any(named: 'topicId')),
+          () => feedRepository.loadFirstPage(topicId: any(named: 'topicId')),
         ).thenThrow(const NetworkException());
         return buildBloc();
       },
@@ -73,34 +75,46 @@ void main() {
         isA<FeedState>().having((s) => s.status, 'status', FeedStatus.failure),
       ],
     );
+
+    blocTest<FeedBloc, FeedState>(
+      'a change anywhere in the store reaches the list',
+      build: () {
+        when(
+          () => feedRepository.loadFirstPage(topicId: any(named: 'topicId')),
+        ).thenAnswer((_) async => const FeedLoadResult(hasMore: true));
+        return buildBloc();
+      },
+      act: (bloc) async {
+        bloc.add(const FeedStarted());
+        await pumpEventQueue();
+        feed.add([makeArticle('a1')]);
+        await pumpEventQueue();
+        feed.add([makeArticle('a1', likes: 11, isLiked: true)]);
+      },
+      skip: 2,
+      expect: () => [
+        isA<FeedState>().having((s) => s.articles.single.likes, 'likes', 10),
+        isA<FeedState>().having((s) => s.articles.single.likes, 'likes', 11),
+      ],
+    );
   });
 
   group('pagination', () {
     blocTest<FeedBloc, FeedState>(
-      'appends the next page and deduplicates by id',
+      'loads the next page and tracks whether more remain',
       build: () {
         when(
-          () =>
-              feedRepository.nextPage('feed_2', topicId: any(named: 'topicId')),
-        ).thenAnswer((_) async => page2);
+          () => feedRepository.loadNextPage(topicId: any(named: 'topicId')),
+        ).thenAnswer((_) async => const FeedLoadResult(hasMore: false));
         return buildBloc();
       },
-      seed: () => FeedState(
-        status: FeedStatus.success,
-        articles: page1.items,
-        nextCursor: 'feed_2',
-      ),
+      seed: () => loaded,
       act: (bloc) => bloc.add(const FeedNextPageRequested()),
       expect: () => [
         isA<FeedState>().having((s) => s.isLoadingMore, 'loadingMore', true),
         isA<FeedState>()
-            .having((s) => s.articles.map((a) => a.id), 'ids', [
-              'a1',
-              'a2',
-              'a3',
-            ])
-            .having((s) => s.nextCursor, 'nextCursor', null)
-            .having((s) => s.isLoadingMore, 'loadingMore', false),
+            .having((s) => s.isLoadingMore, 'loadingMore', false)
+            .having((s) => s.hasMore, 'hasMore', false),
       ],
     );
 
@@ -109,22 +123,17 @@ void main() {
       build: () {
         var calls = 0;
         when(
-          () =>
-              feedRepository.nextPage('feed_2', topicId: any(named: 'topicId')),
+          () => feedRepository.loadNextPage(topicId: any(named: 'topicId')),
         ).thenAnswer((_) async {
           if (++calls == 1) throw const ServerException();
-          return page2;
+          return const FeedLoadResult(hasMore: false);
         });
         return buildBloc();
       },
-      seed: () => FeedState(
-        status: FeedStatus.success,
-        articles: page1.items,
-        nextCursor: 'feed_2',
-      ),
+      seed: () => loaded,
       act: (bloc) async {
         bloc.add(const FeedNextPageRequested());
-        await Future<void>.delayed(const Duration(milliseconds: 10));
+        await pumpEventQueue();
         bloc.add(const FeedNextPageRequested());
       },
       expect: () => [
@@ -134,65 +143,59 @@ void main() {
             .having((s) => s.articles.length, 'list preserved', 2),
         isA<FeedState>().having((s) => s.isLoadingMore, 'loadingMore', true),
         isA<FeedState>()
-            .having((s) => s.articles.map((a) => a.id), 'ids after retry', [
-              'a1',
-              'a2',
-              'a3',
-            ])
-            .having((s) => s.loadMoreFailed, 'loadMoreFailed', false),
+            .having((s) => s.loadMoreFailed, 'loadMoreFailed', false)
+            .having((s) => s.hasMore, 'hasMore', false),
       ],
     );
 
     blocTest<FeedBloc, FeedState>(
-      'ignores a page request when there is no next cursor',
+      'ignores a page request when there is nothing more',
       build: buildBloc,
-      seed: () => FeedState(
-        status: FeedStatus.success,
-        articles: page1.items,
-        nextCursor: null,
-      ),
+      seed: () =>
+          FeedState(status: FeedStatus.success, articles: [makeArticle('a1')]),
       act: (bloc) => bloc.add(const FeedNextPageRequested()),
       expect: () => const <FeedState>[],
       verify: (_) => verifyNever(
-        () => feedRepository.nextPage(any(), topicId: any(named: 'topicId')),
+        () => feedRepository.loadNextPage(topicId: any(named: 'topicId')),
       ),
     );
   });
 
   group('refresh', () {
     blocTest<FeedBloc, FeedState>(
-      'prepends new items without duplicates and drops deleted articles',
+      'announces new stories and clears the stale flag',
       build: () {
         when(
           () => feedRepository.refresh(topicId: any(named: 'topicId')),
-        ).thenAnswer(
-          (_) async => FeedRefreshResult(
-            head: PagedArticles(
-              items: [makeArticle('a0'), makeArticle('a1', likes: 99)],
-              nextCursor: 'feed_2',
-            ),
-            deletedIds: const ['a2'],
-          ),
-        );
+        ).thenAnswer((_) async => const FeedRefreshResult(newStories: 1));
         return buildBloc();
       },
-      seed: () => FeedState(
-        status: FeedStatus.success,
-        articles: [makeArticle('a1'), makeArticle('a2'), makeArticle('a3')],
-        nextCursor: 'feed_4',
-      ),
+      seed: () => loaded,
       act: (bloc) => bloc.add(const FeedRefreshRequested()),
       expect: () => [
         isA<FeedState>().having((s) => s.isRefreshing, 'isRefreshing', true),
         isA<FeedState>()
-            .having((s) => s.articles.map((a) => a.id), 'ids', [
-              'a0',
-              'a1',
-              'a3',
-            ])
-            .having((s) => s.articles[1].likes, 'a1 updated in place', 99)
-            .having((s) => s.nextCursor, 'scroll window kept', 'feed_4')
-            .having((s) => s.notice, 'notice', '1 new story'),
+            .having((s) => s.notice, 'notice', '1 new story')
+            .having((s) => s.isStale, 'isStale', false),
+        isA<FeedState>().having((s) => s.isRefreshing, 'isRefreshing', false),
+      ],
+    );
+
+    blocTest<FeedBloc, FeedState>(
+      'offline, keeps the saved stories and says so',
+      build: () {
+        when(
+          () => feedRepository.refresh(topicId: any(named: 'topicId')),
+        ).thenThrow(const NetworkException());
+        return buildBloc();
+      },
+      seed: () => loaded,
+      act: (bloc) => bloc.add(const FeedRefreshRequested()),
+      expect: () => [
+        isA<FeedState>().having((s) => s.isRefreshing, 'isRefreshing', true),
+        isA<FeedState>()
+            .having((s) => s.isStale, 'isStale', true)
+            .having((s) => s.articles.length, 'list kept', 2),
         isA<FeedState>().having((s) => s.isRefreshing, 'isRefreshing', false),
       ],
     );

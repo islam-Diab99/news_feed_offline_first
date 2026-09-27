@@ -60,34 +60,14 @@ class ArticleDetail extends Equatable {
   List<Object?> get props => [article, body, relatedIds];
 }
 
-sealed class ArticleDetailResult extends Equatable {
-  const ArticleDetailResult();
+enum DetailFetch { fresh, stale, unavailable }
 
-  @override
-  List<Object?> get props => [];
-}
-
-class ArticleDetailAvailable extends ArticleDetailResult {
-  const ArticleDetailAvailable(
-    this.detail, {
-    this.related = const [],
-    this.isStale = false,
-  });
+class ArticleDetailView extends Equatable {
+  const ArticleDetailView(this.detail, {this.related = const []});
 
   final ArticleDetail detail;
   final List<Article> related;
-  final bool isStale;
 
   @override
-  List<Object?> get props => [detail, related, isStale];
-}
-
-class ArticleDetailUnavailable extends ArticleDetailResult {
-  const ArticleDetailUnavailable(this.articleId, {this.reason});
-
-  final String articleId;
-  final String? reason;
-
-  @override
-  List<Object?> get props => [articleId, reason];
+  List<Object?> get props => [detail, related];
 }

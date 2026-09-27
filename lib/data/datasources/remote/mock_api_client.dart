@@ -177,7 +177,8 @@ class MockApiClient implements ApiClient {
     // [setReaction]. Random targets made that path impossible to demo.
     final live = _liveRecords();
     if (live.isNotEmpty) {
-      final record = live[live.length > _pageSize ? _pageSize : live.length - 1];
+      final record =
+          live[live.length > _pageSize ? _pageSize : live.length - 1];
       record['likes'] = (record['likes'] as int) + 3;
       record['version'] = (record['version'] as int? ?? 1) + 1;
       updatedItems.add(record['id'] as String);

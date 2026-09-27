@@ -3,27 +3,31 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:vlau_assessment/domain/entities/paged_articles.dart';
-import 'package:vlau_assessment/domain/services/article_update_bus.dart';
+import 'package:vlau_assessment/domain/entities/article.dart';
 import 'package:vlau_assessment/presentation/blocs/search/search_bloc.dart';
 
 import '../helpers.dart';
 
 void main() {
   late MockSearchRepository repository;
-  late ArticleUpdateBus bus;
+  late MockArticleRepository articles;
 
   const debounce = Duration(milliseconds: 50);
 
   setUp(() {
     repository = MockSearchRepository();
-    bus = ArticleUpdateBus();
-    registerFallbackValue(Duration.zero);
+    articles = MockArticleRepository();
+    registerFallbackValue(<String>[]);
+    when(
+      () => articles.watchArticles(any()),
+    ).thenAnswer((_) => const Stream.empty());
   });
 
-  tearDown(() => bus.dispose());
-
-  SearchBloc buildBloc() =>
-      SearchBloc(searchRepository: repository, bus: bus, debounce: debounce);
+  SearchBloc buildBloc() => SearchBloc(
+    searchRepository: repository,
+    articleRepository: articles,
+    debounce: debounce,
+  );
 
   PagedArticles resultFor(String id) =>
       PagedArticles(items: [makeArticle(id)], total: 1);
@@ -154,4 +158,30 @@ void main() {
     await bloc.close();
   });
 
+  test('results follow later changes to the same articles', () async {
+    final changes = StreamController<List<Article>>();
+    when(
+      () => articles.watchArticles(['a1']),
+    ).thenAnswer((_) => changes.stream);
+    when(
+      () => repository.search(
+        any(),
+        topicId: any(named: 'topicId'),
+        source: any(named: 'source'),
+      ),
+    ).thenAnswer((_) async => resultFor('a1'));
+
+    final bloc = buildBloc();
+    bloc.add(const SearchQueryChanged('flutter'));
+    await Future<void>.delayed(debounce * 3);
+
+    changes.add([makeArticle('a1', likes: 11, isLiked: true)]);
+    await pumpEventQueue();
+
+    expect(bloc.state.results.single.isLiked, isTrue);
+    expect(bloc.state.results.single.likes, 11);
+
+    await bloc.close();
+    await changes.close();
+  });
 }

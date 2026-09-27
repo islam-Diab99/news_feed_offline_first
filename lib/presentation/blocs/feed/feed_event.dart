@@ -26,11 +26,3 @@ class FeedNextPageRequested extends FeedEvent {
 class FeedRefreshRequested extends FeedEvent {
   const FeedRefreshRequested();
 }
-
-class _FeedArticleUpdated extends FeedEvent {
-  const _FeedArticleUpdated(this.update);
-  final ArticleUpdate update;
-
-  @override
-  List<Object?> get props => [update];
-}

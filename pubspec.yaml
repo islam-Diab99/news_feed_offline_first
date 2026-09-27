@@ -20,9 +20,6 @@ dependencies:
 
   get_it: ^8.0.3
 
-  hive_ce: ^2.10.1
-  hive_ce_flutter: ^2.2.0
-  path_provider: ^2.1.5
 
   connectivity_plus: ^6.1.4
 
@@ -31,6 +28,8 @@ dependencies:
   uuid: ^4.5.1
 
   intl: ^0.20.2
+  drift: ^2.31.0
+  drift_flutter: ^0.2.8
 
 dev_dependencies:
   flutter_test:
@@ -39,6 +38,8 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   bloc_test: ^10.0.0
   mocktail: ^1.0.4
+  drift_dev: ^2.31.0
+  build_runner: ^2.15.1
 
 flutter:
   uses-material-design: true

@@ -21,7 +21,7 @@ class ArticleDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) =>
-          ArticleDetailBloc(articleRepository: sl(), bus: sl())
+          ArticleDetailBloc(articleRepository: sl())
             ..add(ArticleDetailRequested(articleId)),
       child: Scaffold(
         appBar: AppBar(title: const Text('Article')),

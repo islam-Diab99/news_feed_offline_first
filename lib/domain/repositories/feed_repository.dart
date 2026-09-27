@@ -1,20 +1,34 @@
-import '../entities/paged_articles.dart';
+import 'package:equatable/equatable.dart';
 
-class FeedRefreshResult {
-  const FeedRefreshResult({required this.head, this.deletedIds = const []});
+import '../entities/article.dart';
 
-  final PagedArticles head;
-  final List<String> deletedIds;
+class FeedLoadResult extends Equatable {
+  const FeedLoadResult({required this.hasMore, this.isStale = false});
+
+  final bool hasMore;
+  final bool isStale;
+
+  @override
+  List<Object?> get props => [hasMore, isStale];
 }
 
-abstract interface class FeedRepository {
-  Future<PagedArticles> firstPage({String? topicId, String? source});
+class FeedRefreshResult extends Equatable {
+  const FeedRefreshResult({required this.newStories});
 
-  Future<PagedArticles> nextPage(
-    String cursor, {
-    String? topicId,
-    String? source,
-  });
+  final int newStories;
+
+  @override
+  List<Object?> get props => [newStories];
+}
+
+/// Loads write into the local store; [watchFeed] is the only read path, so
+/// every screen sees the same data no matter which call changed it.
+abstract interface class FeedRepository {
+  Stream<List<Article>> watchFeed({String? topicId, String? source});
+
+  Future<FeedLoadResult> loadFirstPage({String? topicId, String? source});
+
+  Future<FeedLoadResult> loadNextPage({String? topicId, String? source});
 
   Future<FeedRefreshResult> refresh({String? topicId, String? source});
 }

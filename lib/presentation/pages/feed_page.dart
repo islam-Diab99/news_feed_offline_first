@@ -46,7 +46,7 @@ class FeedPage extends StatelessWidget {
                     previous.articles != current.articles ||
                     previous.topicNames != current.topicNames ||
                     previous.topicId != current.topicId ||
-                    previous.nextCursor != current.nextCursor ||
+                    previous.hasMore != current.hasMore ||
                     previous.isLoadingMore != current.isLoadingMore ||
                     previous.loadMoreFailed != current.loadMoreFailed ||
                     previous.errorMessage != current.errorMessage,

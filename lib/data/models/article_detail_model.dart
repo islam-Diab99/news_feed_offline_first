@@ -5,7 +5,7 @@ abstract final class ArticleDetailModel {
   static ArticleDetail fromJson(Map<String, dynamic> json) {
     return ArticleDetail(
       article: ArticleModel.fromJson(json),
-      body: _parseBody(json['body'] as List? ?? const []),
+      body: bodyFromJson(json['body'] as List? ?? const []),
       authorBio: (json['author'] as Map<String, dynamic>?)?['bio'] as String?,
       updatedAt: DateTime.tryParse(json['updatedAt'] as String? ?? ''),
       readTimeMinutes: (json['readTimeMinutes'] as num?)?.toInt(),
@@ -13,7 +13,7 @@ abstract final class ArticleDetailModel {
     );
   }
 
-  static List<ContentBlock> _parseBody(List blocks) {
+  static List<ContentBlock> bodyFromJson(List blocks) {
     return blocks
         .whereType<Map<String, dynamic>>()
         .map<ContentBlock?>(
@@ -28,17 +28,19 @@ abstract final class ArticleDetailModel {
         .toList();
   }
 
+  static List<Map<String, dynamic>> bodyToJson(List<ContentBlock> body) => body
+      .map(
+        (block) => switch (block) {
+          ParagraphBlock(:final text) => {'type': 'paragraph', 'text': text},
+          ImageBlock(:final url) => {'type': 'image', 'url': url},
+          QuoteBlock(:final text) => {'type': 'quote', 'text': text},
+        },
+      )
+      .toList();
+
   static Map<String, dynamic> toJson(ArticleDetail detail) => {
     ...ArticleModel.toJson(detail.article),
-    'body': detail.body
-        .map(
-          (block) => switch (block) {
-            ParagraphBlock(:final text) => {'type': 'paragraph', 'text': text},
-            ImageBlock(:final url) => {'type': 'image', 'url': url},
-            QuoteBlock(:final text) => {'type': 'quote', 'text': text},
-          },
-        )
-        .toList(),
+    'body': bodyToJson(detail.body),
     'author': {
       'name': detail.article.authorName,
       if (detail.article.authorAvatar != null)

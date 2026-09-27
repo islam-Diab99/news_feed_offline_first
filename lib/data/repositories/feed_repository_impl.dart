@@ -1,132 +1,93 @@
 import '../../core/error/app_exception.dart';
-import '../../domain/entities/paged_articles.dart';
+import '../../domain/entities/article.dart';
 import '../../domain/repositories/feed_repository.dart';
-import '../datasources/local/local_store.dart';
+import '../datasources/local/app_database.dart';
 import '../datasources/remote/api_client.dart';
 
 class FeedRepositoryImpl implements FeedRepository {
-  FeedRepositoryImpl({
-    required ApiClient api,
-    required LocalStore store,
-    this.cacheTtl = const Duration(minutes: 30),
-  }) : _api = api,
-       _store = store;
+  FeedRepositoryImpl({required ApiClient api, required AppDatabase db})
+    : _api = api,
+      _db = db;
 
   final ApiClient _api;
-  final LocalStore _store;
-  final Duration cacheTtl;
+  final AppDatabase _db;
 
-  static String filterKey({String? topicId, String? source}) =>
+  static String feedKey({String? topicId, String? source}) =>
       '${topicId ?? '*'}|${source ?? '*'}';
 
   @override
-  Future<PagedArticles> firstPage({String? topicId, String? source}) async {
-    final key = filterKey(topicId: topicId, source: source);
+  Stream<List<Article>> watchFeed({String? topicId, String? source}) =>
+      _db.articleDao.watchFeed(feedKey(topicId: topicId, source: source));
+
+  @override
+  Future<FeedLoadResult> loadFirstPage({
+    String? topicId,
+    String? source,
+  }) async {
+    final key = feedKey(topicId: topicId, source: source);
     try {
-      final response = await _api.getFeed(
+      final page = await _api.getFeed(
         page: 1,
         topicId: topicId,
         source: source,
       );
-      final items = await _store.withLocalState(response.items);
-      await _store.saveFeedSnapshot(
-        key,
-        items,
-        nextCursor: response.nextCursor,
-      );
-      return PagedArticles(
-        items: items,
-        nextCursor: response.nextCursor,
-        total: response.total,
-      );
+      await _db.transaction(() async {
+        await _db.feedDao.clearEntries(key);
+        await _savePage(key, page);
+      });
+      return FeedLoadResult(hasMore: page.nextCursor != null);
     } on NetworkException {
-      final cached = await _cachedFeed(key);
+      final cached = await _db.feedDao.feed(key);
       if (cached == null) rethrow;
-      return cached;
+      return FeedLoadResult(hasMore: cached.nextCursor != null, isStale: true);
     }
   }
 
   @override
-  Future<PagedArticles> nextPage(
-    String cursor, {
-    String? topicId,
-    String? source,
-  }) async {
-    final response = await _api.getFeed(
+  Future<FeedLoadResult> loadNextPage({String? topicId, String? source}) async {
+    final key = feedKey(topicId: topicId, source: source);
+    final cursor = (await _db.feedDao.feed(key))?.nextCursor;
+    if (cursor == null) return const FeedLoadResult(hasMore: false);
+
+    final page = await _api.getFeed(
       cursor: cursor,
       topicId: topicId,
       source: source,
     );
-
-    final items = await _store.withLocalState(response.items);
-    final key = filterKey(topicId: topicId, source: source);
-    final snapshot = await _store.feedSnapshot(key);
-    if (snapshot != null) {
-      final seen = snapshot.articles.map((a) => a.id).toSet();
-      await _store.saveFeedSnapshot(key, [
-        ...snapshot.articles,
-        ...items.where((a) => !seen.contains(a.id)),
-      ], nextCursor: response.nextCursor);
-    } else {
-      await _store.upsertArticles(items);
-    }
-
-    return PagedArticles(
-      items: items,
-      nextCursor: response.nextCursor,
-      total: response.total,
-    );
+    await _db.transaction(() => _savePage(key, page));
+    return FeedLoadResult(hasMore: page.nextCursor != null);
   }
 
   @override
   Future<FeedRefreshResult> refresh({String? topicId, String? source}) async {
+    final key = feedKey(topicId: topicId, source: source);
     final since =
-        await _store.lastFeedSyncTime() ??
+        await _db.feedDao.lastSync() ??
         DateTime.now().subtract(const Duration(days: 1));
     final updates = await _api.getFeedUpdates(since);
-    await _store.setLastFeedSyncTime(updates.serverTime);
-
-    for (final id in updates.deletedItems) {
-      await _store.removeArticle(id);
-    }
-
     final head = await _api.getFeed(page: 1, topicId: topicId, source: source);
-    final items = await _store.withLocalState(head.items);
-    await _store.upsertArticles(items);
 
-    final key = filterKey(topicId: topicId, source: source);
-    final snapshot = await _store.feedSnapshot(key);
-    if (snapshot != null) {
-      final headIds = items.map((a) => a.id).toSet();
-      final deleted = updates.deletedItems.toSet();
-      await _store.saveFeedSnapshot(key, [
-        ...items,
-        ...snapshot.articles.where(
-          (a) => !headIds.contains(a.id) && !deleted.contains(a.id),
-        ),
-      ], nextCursor: snapshot.nextCursor);
-    }
+    return _db.transaction(() async {
+      final known = await _db.feedDao.entryIds(key);
+      final hasCursor = await _db.feedDao.feed(key) != null;
 
-    return FeedRefreshResult(
-      head: PagedArticles(
-        items: items,
-        nextCursor: head.nextCursor,
-        total: head.total,
-      ),
-      deletedIds: updates.deletedItems,
-    );
+      await _db.feedDao.setLastSync(updates.serverTime);
+      await _db.articleDao.deleteArticles(updates.deletedItems);
+      await _db.articleDao.saveServerArticles(head.items);
+      await _db.feedDao.addEntries(key, head.items.map((a) => a.id));
+      // An existing cursor already points past everything loaded so far;
+      // resetting it to page 2 would throw away the user's scroll window.
+      if (!hasCursor) await _db.feedDao.setCursor(key, head.nextCursor);
+
+      return FeedRefreshResult(
+        newStories: head.items.where((a) => !known.contains(a.id)).length,
+      );
+    });
   }
 
-  Future<PagedArticles?> _cachedFeed(String key) async {
-    final snapshot = await _store.feedSnapshot(key);
-    if (snapshot == null || snapshot.articles.isEmpty) return null;
-    return PagedArticles(
-      items: snapshot.articles,
-      nextCursor: null,
-      isStale: true,
-    );
+  Future<void> _savePage(String key, FeedPageResponse page) async {
+    await _db.articleDao.saveServerArticles(page.items);
+    await _db.feedDao.addEntries(key, page.items.map((a) => a.id));
+    await _db.feedDao.setCursor(key, page.nextCursor);
   }
-
-  bool isExpired(DateTime savedAt) =>
-      DateTime.now().toUtc().difference(savedAt.toUtc()) > cacheTtl;
 }

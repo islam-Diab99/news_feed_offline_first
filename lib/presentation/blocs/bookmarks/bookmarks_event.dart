@@ -10,11 +10,3 @@ sealed class BookmarksEvent extends Equatable {
 class BookmarksRequested extends BookmarksEvent {
   const BookmarksRequested();
 }
-
-class _BookmarksArticleUpdated extends BookmarksEvent {
-  const _BookmarksArticleUpdated(this.update);
-  final ArticleUpdate update;
-
-  @override
-  List<Object?> get props => [update];
-}

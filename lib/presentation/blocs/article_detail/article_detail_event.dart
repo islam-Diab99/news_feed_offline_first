@@ -14,11 +14,3 @@ class ArticleDetailRequested extends ArticleDetailEvent {
   @override
   List<Object?> get props => [articleId];
 }
-
-class _ArticleDetailArticleUpdated extends ArticleDetailEvent {
-  const _ArticleDetailArticleUpdated(this.update);
-  final ArticleUpdate update;
-
-  @override
-  List<Object?> get props => [update];
-}

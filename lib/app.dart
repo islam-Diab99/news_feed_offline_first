@@ -29,17 +29,17 @@ class NewsFeedApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (_) =>
-              FeedBloc(feedRepository: sl(), searchRepository: sl(), bus: sl())
+              FeedBloc(feedRepository: sl(), searchRepository: sl())
                 ..add(const FeedStarted()),
         ),
         BlocProvider(
           create: (_) =>
-              SearchBloc(searchRepository: sl(), bus: sl())
+              SearchBloc(searchRepository: sl(), articleRepository: sl())
                 ..add(const SearchStarted()),
         ),
         BlocProvider(
           create: (_) =>
-              BookmarksBloc(bookmarkRepository: sl(), bus: sl())
+              BookmarksBloc(bookmarkRepository: sl())
                 ..add(const BookmarksRequested()),
         ),
       ],

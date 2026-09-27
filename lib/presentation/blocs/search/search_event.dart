@@ -47,10 +47,11 @@ class SearchRetryRequested extends SearchEvent {
   const SearchRetryRequested();
 }
 
-class _SearchArticleUpdated extends SearchEvent {
-  const _SearchArticleUpdated(this.update);
-  final ArticleUpdate update;
+class _SearchResultsShown extends SearchEvent {
+  const _SearchResultsShown(this.generation, this.ids);
+  final int generation;
+  final List<String> ids;
 
   @override
-  List<Object?> get props => [update];
+  List<Object?> get props => [generation, ids];
 }

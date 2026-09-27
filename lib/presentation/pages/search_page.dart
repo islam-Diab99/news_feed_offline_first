@@ -188,8 +188,9 @@ class _SourceRow extends StatelessWidget {
               builder: (context, controller, _) {
                 final selected = source != null;
                 return OutlinedButton.icon(
-                  onPressed: () =>
-                      controller.isOpen ? controller.close() : controller.open(),
+                  onPressed: () => controller.isOpen
+                      ? controller.close()
+                      : controller.open(),
                   icon: const Icon(Icons.rss_feed, size: 18),
                   label: Text(
                     source ?? 'All sources',
