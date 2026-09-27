@@ -3,19 +3,19 @@ import 'dart:async';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:vlau_assessment/core/articles/data/local/app_database.dart';
+import 'package:vlau_assessment/core/articles/data/local/db_transaction.dart';
+import 'package:vlau_assessment/core/articles/data/remote/api_client.dart';
+import 'package:vlau_assessment/core/articles/data/repositories/bookmark_repository_impl.dart';
+import 'package:vlau_assessment/core/articles/data/repositories/reaction_repository_impl.dart';
+import 'package:vlau_assessment/core/articles/domain/entities/article.dart';
+import 'package:vlau_assessment/core/articles/domain/repositories/topic_repository.dart';
 import 'package:vlau_assessment/core/network/connectivity_service.dart';
-import 'package:vlau_assessment/data/datasources/local/app_database.dart';
-import 'package:vlau_assessment/data/datasources/local/db_transaction.dart';
-import 'package:vlau_assessment/data/datasources/remote/api_client.dart';
-import 'package:vlau_assessment/data/repositories/bookmark_repository_impl.dart';
-import 'package:vlau_assessment/data/repositories/feed_repository_impl.dart';
-import 'package:vlau_assessment/data/repositories/reaction_repository_impl.dart';
-import 'package:vlau_assessment/data/services/outbox_sync_service.dart';
-import 'package:vlau_assessment/domain/entities/article.dart';
-import 'package:vlau_assessment/domain/repositories/article_repository.dart';
-import 'package:vlau_assessment/domain/repositories/feed_repository.dart';
-import 'package:vlau_assessment/domain/repositories/search_repository.dart';
-import 'package:vlau_assessment/domain/services/sync_service.dart';
+import 'package:vlau_assessment/core/sync/outbox_sync_service.dart';
+import 'package:vlau_assessment/core/sync/sync_service.dart';
+import 'package:vlau_assessment/features/feed/data/feed_repository_impl.dart';
+import 'package:vlau_assessment/features/feed/domain/feed_repository.dart';
+import 'package:vlau_assessment/features/search/domain/search_repository.dart';
 
 class MockApi extends Mock implements ApiClient {}
 
@@ -23,7 +23,7 @@ class MockFeedRepository extends Mock implements FeedRepository {}
 
 class MockSearchRepository extends Mock implements SearchRepository {}
 
-class MockArticleRepository extends Mock implements ArticleRepository {}
+class MockTopicRepository extends Mock implements TopicRepository {}
 
 /// A real SQLite database in memory: tests exercise the same queries,
 /// constraints and cascades as the app instead of a hand-written fake.

@@ -2,7 +2,7 @@
 
 A news feed app with a paginated feed, debounced search, article details, offline-first bookmarks, optimistic reactions, and an offline mutation outbox — built against a local mock backend.
 
-**Stack:** Flutter · BLoC · Hive · get_it · Clean Architecture · 24 tests
+**Stack:** Flutter · BLoC · Drift (SQLite) · get_it · feature-first Clean Architecture · 41 tests
 
 ---
 
@@ -68,43 +68,55 @@ The parts of the codebase that carry the most design weight, in reading order:
 
 | # | File | Why it matters |
 |---|---|---|
-| 1 | `lib/domain/services/article_update_bus.dart` | The one custom concept in the app: how the feed, search, bookmarks, and an open detail page stay consistent without knowing about each other |
-| 2 | `lib/data/repositories/reaction_repository_impl.dart` | Optimistic apply → confirm / conflict-reconcile / rollback, plus offline queueing with last-intent coalescing |
-| 3 | `lib/data/services/outbox_sync_service.dart` | What happens on reconnect: ordered replay, idempotency keys, server-wins conflicts |
-| 4 | `lib/presentation/widgets/paginated_article_list.dart` | One list implementation (pagination, footer states, scroll retention) shared by all three tabs |
-| 5 | `test/data/reaction_repository_test.dart` | Every failure path above (rollback, conflict, offline queueing, coalescing) exercised end to end |
+| 1 | `lib/core/articles/data/local/article_read_model.dart` | The one place server state and local intent meet: every DAO reads articles through this SQL join, which is how the feed, search, bookmarks and an open detail page stay consistent without knowing about each other |
+| 2 | `lib/core/articles/data/local/app_database.dart` + `daos/` | The schema, and one DAO per table: each writes only its own table and reads the rest through joins |
+| 3 | `lib/core/articles/data/repositories/reaction_repository_impl.dart` | Optimistic apply → confirm / conflict-reconcile / rollback, plus offline queueing with last-intent coalescing |
+| 4 | `lib/core/sync/outbox_sync_service.dart` | What happens on reconnect: ordered replay, idempotency keys, server-wins conflicts |
+| 5 | `test/core/articles/reaction_repository_test.dart` | Every failure path above (rollback, conflict, offline queueing, coalescing) exercised end to end against a real in-memory SQLite database |
 
 ---
 
 ## Architecture
 
-Clean-architecture layering with BLoC for state management:
+Feature-first Clean Architecture with BLoC for state management. Each feature owns its screen, bloc and repository; everything that is about *an article* lives once in `core/articles`.
 
 ```
 lib/
-├── core/            # DI (get_it), typed exceptions, connectivity, theme, bloc transformers
-├── domain/          # Pure Dart: entities, repository interfaces, ArticleUpdateBus, SyncService
-├── data/
-│   ├── datasources/
-│   │   ├── remote/  # ApiClient interface + MockApiClient (asset-backed "server")
-│   │   └── local/   # LocalStore interface + HiveLocalStore (cache, bookmarks, outbox)
-│   ├── models/      # JSON mapping (wire format ↔ entities)
-│   ├── repositories/# Feed, Search, Article, Bookmark, Reaction implementations
-│   └── services/    # OutboxSyncService (drains queued mutations on reconnect)
-└── presentation/
-    ├── blocs/       # Feed, Search, ArticleDetail, Bookmarks, Engagement, Connectivity
-    ├── pages/       # Feed, Search, Bookmarks, Article details, Home shell
-    └── widgets/     # PaginatedArticleList (shared by all 3 tabs), ArticleCard,
-                     # AppNetworkImage, OfflineBanner, skeletons, error/empty views
+├── main.dart
+├── app/                     # App widget, home shell, DI composition root (get_it)
+├── core/
+│   ├── articles/            # The shared article module
+│   │   ├── domain/          # Article, ArticleDetail, Topic entities; Bookmark/Reaction/Topic repositories
+│   │   ├── data/
+│   │   │   ├── local/       # AppDatabase (Drift), ArticleReadModel, DbTransaction, daos/ (one per table)
+│   │   │   ├── remote/      # ApiClient interface + MockApiClient (asset-backed "server")
+│   │   │   ├── models/      # JSON mapping (wire format ↔ entities)
+│   │   │   └── repositories/
+│   │   └── presentation/    # EngagementBloc (like/bookmark), ArticleCard, PaginatedArticleList
+│   ├── sync/                # SyncService + OutboxSyncService, ConnectivityCubit, OfflineBanner
+│   ├── network/  error/  theme/  utils/  widgets/
+└── features/
+    ├── feed/                # domain/ FeedRepository · data/ impl · presentation/ bloc + page
+    ├── search/
+    ├── bookmarks/
+    └── article_detail/
 ```
+
+Dependencies point one way: features depend on `core`, `core` never imports a feature. The only feature-to-feature link is navigation (`ArticleDetailPage.open`), which the shared list receives as an `onOpen` callback.
 
 ### Key decisions
 
-**`ArticleUpdateBus` — an own-design piece, not a package.**
-A broadcast stream of canonical article changes. Repositories publish after any mutation (like, bookmark, server reconciliation, deletion); every bloc holding a list patches itself. This is what keeps the feed, search results, bookmarks, and an open detail page consistent without any of them knowing about each other.
+**The database is the single source of truth; the UI watches it.**
+Repositories write network results into SQLite and expose Drift `watch()` queries; blocs subscribe to those streams. A like on the feed is one row change, and every screen showing that article re-emits on its own: nothing publishes change events, and a screen that subscribes late still gets the current value.
 
-**Repositories behind interfaces, wired in one composition root** (`core/di/injector.dart`).
-The mock API or the Hive store can be swapped without touching a single consumer — and tests do exactly that.
+**One DAO per table, composed in SQL.**
+`ArticlesDao`, `BookmarksDao`, `ArticleDetailsDao`, `FeedDao` and `OutboxDao` each write only their own table. Reading an article always joins the bookmark row and any queued reaction (`ArticleReadModel`), so no DAO depends on another: they share tables, not classes.
+
+**Server state and local intent live in separate tables.**
+`articles` holds only what the server said. "Bookmarked" is a row in `bookmarks`; an unconfirmed like is a row in `pending_mutations`, which doubles as the optimistic state. A network upsert therefore cannot erase a local action, and rollback just deletes (or restores) the queued row.
+
+**Repositories get the DAOs they need, not the database** (`app/injector.dart`).
+Writes that must span tables go through a small `DbTransaction`. Tests build repositories over a real in-memory database instead of a hand-written fake.
 
 **Typed failures** (`NetworkException`, `ServerException`, `NotFoundException`).
 Thrown by the data layer; blocs map them to distinct UI states instead of string-matching errors.
@@ -122,10 +134,10 @@ At this scope, one-line use cases would only add indirection; the domain boundar
 | US2 Refresh | Done | Pull to refresh prepends new items, dedups by id, updates changed items, keeps scroll window |
 | US3 Search | Done | 400 ms debounce in the bloc (rxdart `debounceTime` + `restartable()`), stale-request cancellation, topic + source filters preserved across queries |
 | US4 Details | Done | Typed content blocks (paragraph/image/quote — unknown types dropped safely), author bio, tags, related stories |
-| US5 Bookmark | Done | Local-first, persisted in Hive, dedicated tab, fully offline across sessions |
+| US5 Bookmark | Done | Local-first, persisted in SQLite, dedicated tab, fully offline across sessions |
 | US6 Reactions | Done | Optimistic toggle, in-flight duplicate guard, confirm/reconcile/rollback (the mock server fails every 3rd reaction to make rollback demonstrable) |
 | US7 Consistency | Done | `/feed/updates`-style reconciliation: refresh applies new/updated/deleted ids; opening a removed article shows a graceful "unavailable" state and drops it from open lists |
-| US8 Offline | Done | Feed pages + details cached in Hive; offline banner; bookmarks and reactions work offline and queue in the outbox |
+| US8 Offline | Done | Feed pages + details cached in SQLite; offline banner; bookmarks and reactions work offline and queue in the outbox |
 | US9 Resilience | Done | Distinct skeleton/loading, empty, full-screen error, page-level error (footer retry), and stale-data states |
 
 **Also included:**
@@ -147,7 +159,7 @@ On `NetworkException`, the repository serves the persisted snapshot (everything 
 Bookmarks commit locally first and sync best-effort. Reactions apply optimistically; if the device is offline (or drops mid-request) the optimistic state is kept and the mutation is queued.
 
 **Outbox.**
-Each queued mutation carries a UUID idempotency key. Repeated toggles of the same article are **coalesced** to the final intent (an offline like + unlike never replays as two mutations). On reconnect, `OutboxSyncService` replays the queue in order through `POST /sync`; applied mutations are removed, conflicting ones adopt the authoritative server state and broadcast it so the UI visibly reconciles.
+Each queued mutation carries a UUID idempotency key. Repeated toggles of the same article are **coalesced** to the final intent (an offline like + unlike never replays as two mutations). On reconnect, `OutboxSyncService` replays the queue in order through `POST /sync`; applied mutations are removed and conflicting ones adopt the authoritative server state; because every screen watches the database, the UI reconciles on its own.
 
 **Reaction conflicts online.**
 Requests carry `expectedVersion`; on a version conflict the server state wins and replaces the optimistic guess.
@@ -160,28 +172,28 @@ Requests carry `expectedVersion`; on a version conflict the server state wins an
 flutter test
 ```
 
-**24 tests** covering the required business logic:
+**41 tests** covering the required business logic:
 
 | Area | File | Covers |
 |---|---|---|
-| Feed pagination | `test/blocs/feed_bloc_test.dart` | First page, append + dedup, page-level failure that preserves the list + retry, refresh prepend/update/delete reconciliation |
-| Search debounce | `test/blocs/search_bloc_test.dart` | One request for rapid keystrokes, a stale in-flight response can never overwrite newer results, filters preserved |
-| Bookmark persistence | `test/data/bookmark_repository_test.dart` | Real Hive store in a temp dir, survives a simulated restart (close + reopen), offline queueing and coalescing |
-| Reaction rollback | `test/data/reaction_repository_test.dart` | Optimistic apply, exact rollback on failure, conflict reconciliation, duplicate-submission guard, offline queueing |
-| Widget test | `test/widgets/feed_page_test.dart` | The primary state transition (skeleton → loaded list), plus error-with-retry and empty states |
+| Feed pagination | `test/features/feed/feed_bloc_test.dart`, `feed_repository_test.dart` | First page, append + dedup, page-level failure that preserves the list + retry, refresh reconciliation, offline fallback |
+| Search debounce | `test/features/search/search_bloc_test.dart` | One request for rapid keystrokes, a stale in-flight response can never overwrite newer results, filters preserved, results stay live |
+| Bookmark persistence | `test/core/articles/bookmark_repository_test.dart` | Real SQLite file in a temp dir, survives a simulated restart (close + reopen), offline queueing and coalescing |
+| Reaction rollback | `test/core/articles/reaction_repository_test.dart` | Optimistic apply, exact rollback on failure, conflict reconciliation, duplicate-submission guard, offline queueing, outbox sync |
+| Widget test | `test/features/feed/feed_page_test.dart` | The primary state transition (skeleton → loaded list), plus error-with-retry and empty states |
 
 ---
 
 ## Tradeoffs & Known Limitations
 
-**Hive (`hive_ce`) over sqflite/drift.**
-JSON-string values in Hive boxes keep the storage schema identical to the wire format with zero codegen, and the store is unit-testable in pure Dart. A relational store would pay off with real data volumes and queries; not at mock scale.
+**Drift (SQLite) over a key-value store.**
+The app's core question, "this article, plus whether I bookmarked it, plus any like still waiting to sync", is a join. In a key-value store that join is hand-written Dart, which forces every read into one class that can see every box. In SQLite it is one query, which is what lets each table have its own DAO, gives transactions and foreign-key cascades (a story the publisher deletes disappears from every feed, bookmark and detail at once), and makes `watch()` streams possible. The cost is code generation (`build_runner`) and a schema to migrate.
 
 **rxdart for search debounce.**
 The debounce transformer started as a hand-rolled `Timer`/`StreamController` implementation (~30 lines of stream plumbing) and was replaced with rxdart's `debounceTime` — one line, battle-tested, and rxdart was already in the dependency tree transitively. The tradeoff is one more direct dependency for a single operator; taken because less code to review beats demonstrating stream internals. The composition with `restartable()` (the part that actually prevents stale results) is unchanged and still covered by tests.
 
-**A custom `ArticleUpdateBus` instead of bloc-to-bloc coupling or a package.**
-Cross-screen consistency (US7) is solved with a hand-designed broadcast stream of canonical article changes — not with blocs listening to each other, a shared "app state" bloc, or an event-bus package. Direct bloc references couple every feature to every other, and a global state object forces all screens to rebuild together. The bus's own tradeoff: it is fire-and-forget (no replay for late subscribers — acceptable since every bloc loads its own data first and only needs deltas after that), and it is one custom concept a reviewer has to learn, which this section explains.
+**Reactive queries instead of an event bus or bloc-to-bloc coupling.**
+Cross-screen consistency (US7) comes from every screen watching the same tables, not from blocs listening to each other, a shared "app state" bloc, or an event bus. An earlier version used a custom broadcast bus of article changes; it worked, but every writer had to remember to publish and late subscribers missed events. With the database as the source of truth, there is nothing to forget. The tradeoff is that search results, which are not persisted as a list, keep their ids in the bloc and re-subscribe to those rows whenever the result set changes.
 
 **`AppNetworkImage` over raw `CachedNetworkImage`.**
 One shared widget wraps every network image so the placeholder/error look lives in one place, and — more importantly — it caps decode size with `memCacheWidth` derived from the actual layout slot (× device pixel ratio, quantized to 50 px steps, capped at 1600 physical px). Full-resolution images never sit decoded in memory for card-sized slots. The tradeoff is a small indirection layer and re-decoding on real layout changes such as rotation, which is the correct behavior anyway.
