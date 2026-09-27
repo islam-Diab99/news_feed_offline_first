@@ -39,7 +39,7 @@ void main() {
   setUp(() {
     db = memoryDatabase();
     api = MockApi();
-    repository = FeedRepositoryImpl(api: api, db: db);
+    repository = feedRepository(api, db);
   });
 
   tearDown(() => db.close());
@@ -124,7 +124,7 @@ void main() {
     final subscription = repository.watchFeed().listen(emissions.add);
     await pumpEventQueue();
 
-    await db.articleDao.setBookmarked('a1', bookmarked: true);
+    await db.bookmarksDao.setBookmarked('a1', bookmarked: true);
     await pumpEventQueue();
 
     expect(emissions.last.single.isBookmarked, isTrue);

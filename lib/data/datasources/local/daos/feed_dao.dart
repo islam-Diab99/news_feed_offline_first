@@ -1,14 +1,46 @@
 import 'package:drift/drift.dart';
 
+import '../../../../domain/entities/article.dart';
 import '../app_database.dart';
+import '../article_read_model.dart';
 
 part 'feed_dao.g.dart';
 
-@DriftAccessor(tables: [FeedEntries, Feeds, KeyValues])
-class FeedDao extends DatabaseAccessor<AppDatabase> with _$FeedDaoMixin {
+/// Owns feed membership ([FeedEntries]), per-feed cursors ([Feeds]) and the
+/// incremental-sync watermark. Order and dedup are the query's job: a feed is
+/// a set of entries sorted by publish time, not a list kept in Dart.
+@DriftAccessor(
+  tables: [
+    FeedEntries,
+    Feeds,
+    KeyValues,
+    Articles,
+    Bookmarks,
+    PendingMutations,
+  ],
+)
+class FeedDao extends DatabaseAccessor<AppDatabase>
+    with _$FeedDaoMixin, ArticleReadModel {
   FeedDao(super.attachedDatabase);
 
   static const _lastSyncKey = 'feed.lastSync';
+
+  Stream<List<Article>> watchFeed(String feedKey) {
+    final query =
+        selectArticles(
+          joins: [
+            innerJoin(
+              feedEntries,
+              feedEntries.articleId.equalsExp(articles.id) &
+                  feedEntries.feedKey.equals(feedKey),
+            ),
+          ],
+        )..orderBy([
+          OrderingTerm.desc(articles.publishedAt),
+          OrderingTerm.asc(articles.id),
+        ]);
+    return query.map(readArticle).watch();
+  }
 
   Future<FeedRow?> feed(String feedKey) => (select(
     feeds,

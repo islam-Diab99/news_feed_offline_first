@@ -2,6 +2,7 @@ import 'package:drift_flutter/drift_flutter.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../data/datasources/local/app_database.dart';
+import '../../data/datasources/local/db_transaction.dart';
 import '../../data/datasources/remote/api_client.dart';
 import '../../data/datasources/remote/mock_api_client.dart';
 import '../../data/repositories/article_repository_impl.dart';
@@ -24,31 +25,63 @@ Future<void> configureDependencies() async {
   final connectivity = AppConnectivityService();
   sl.registerSingleton<ConnectivityController>(connectivity);
   sl.registerSingleton<ConnectivityService>(connectivity);
-  sl.registerSingleton<AppDatabase>(
-    AppDatabase(driftDatabase(name: 'news_feed')),
-    dispose: (db) => db.close(),
-  );
+  final db = AppDatabase(driftDatabase(name: 'news_feed'));
+  sl.registerSingleton<AppDatabase>(db, dispose: (db) => db.close());
+  sl.registerSingleton(db.articlesDao);
+  sl.registerSingleton(db.bookmarksDao);
+  sl.registerSingleton(db.articleDetailsDao);
+  sl.registerSingleton(db.feedDao);
+  sl.registerSingleton(db.outboxDao);
+  sl.registerSingleton(DbTransaction(db));
   sl.registerLazySingleton<ApiClient>(
     () => MockApiClient(connectivity: sl<ConnectivityService>()),
   );
 
   sl.registerLazySingleton<FeedRepository>(
-    () => FeedRepositoryImpl(api: sl(), db: sl()),
+    () => FeedRepositoryImpl(
+      api: sl(),
+      articles: sl(),
+      feed: sl(),
+      transaction: sl(),
+    ),
   );
   sl.registerLazySingleton<SearchRepository>(
-    () => SearchRepositoryImpl(api: sl(), db: sl()),
+    () => SearchRepositoryImpl(api: sl(), articles: sl()),
   );
   sl.registerLazySingleton<ArticleRepository>(
-    () => ArticleRepositoryImpl(api: sl(), db: sl()),
+    () => ArticleRepositoryImpl(
+      api: sl(),
+      articles: sl(),
+      details: sl(),
+      transaction: sl(),
+    ),
   );
   sl.registerLazySingleton<BookmarkRepository>(
-    () => BookmarkRepositoryImpl(api: sl(), db: sl(), connectivity: sl()),
+    () => BookmarkRepositoryImpl(
+      api: sl(),
+      bookmarks: sl(),
+      outbox: sl(),
+      transaction: sl(),
+      connectivity: sl(),
+    ),
   );
   sl.registerLazySingleton<ReactionRepository>(
-    () => ReactionRepositoryImpl(api: sl(), db: sl(), connectivity: sl()),
+    () => ReactionRepositoryImpl(
+      api: sl(),
+      articles: sl(),
+      outbox: sl(),
+      transaction: sl(),
+      connectivity: sl(),
+    ),
   );
 
   sl.registerSingleton<SyncService>(
-    OutboxSyncService(api: sl(), db: sl(), connectivity: sl())..start(),
+    OutboxSyncService(
+      api: sl(),
+      articles: sl(),
+      outbox: sl(),
+      transaction: sl(),
+      connectivity: sl(),
+    )..start(),
   );
 }

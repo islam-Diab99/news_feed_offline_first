@@ -4,12 +4,13 @@ import 'package:drift/drift.dart';
 
 import '../../../domain/entities/article_detail.dart';
 import '../../models/article_detail_model.dart';
-import 'daos/article_dao.dart';
+import 'daos/article_details_dao.dart';
+import 'daos/articles_dao.dart';
+import 'daos/bookmarks_dao.dart';
 import 'daos/feed_dao.dart';
 import 'daos/outbox_dao.dart';
 
 part 'app_database.g.dart';
-
 
 @DataClassName('ArticleRow')
 @TableIndex(name: 'articles_published_at', columns: {#publishedAt})
@@ -78,7 +79,6 @@ class Feeds extends Table {
 
 enum MutationKind { reaction, bookmark }
 
-
 @DataClassName('PendingMutation')
 class PendingMutations extends Table {
   TextColumn get kind => textEnum<MutationKind>()();
@@ -133,7 +133,7 @@ class ContentBlocksConverter extends TypeConverter<List<ContentBlock>, String> {
     PendingMutations,
     KeyValues,
   ],
-  daos: [ArticleDao, FeedDao, OutboxDao],
+  daos: [ArticlesDao, BookmarksDao, ArticleDetailsDao, FeedDao, OutboxDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);

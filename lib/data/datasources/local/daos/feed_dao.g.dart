@@ -8,6 +8,9 @@ mixin _$FeedDaoMixin on DatabaseAccessor<AppDatabase> {
   $FeedEntriesTable get feedEntries => attachedDatabase.feedEntries;
   $FeedsTable get feeds => attachedDatabase.feeds;
   $KeyValuesTable get keyValues => attachedDatabase.keyValues;
+  $BookmarksTable get bookmarks => attachedDatabase.bookmarks;
+  $PendingMutationsTable get pendingMutations =>
+      attachedDatabase.pendingMutations;
   FeedDaoManager get managers => FeedDaoManager(this);
 }
 
@@ -22,4 +25,11 @@ class FeedDaoManager {
       $$FeedsTableTableManager(_db.attachedDatabase, _db.feeds);
   $$KeyValuesTableTableManager get keyValues =>
       $$KeyValuesTableTableManager(_db.attachedDatabase, _db.keyValues);
+  $$BookmarksTableTableManager get bookmarks =>
+      $$BookmarksTableTableManager(_db.attachedDatabase, _db.bookmarks);
+  $$PendingMutationsTableTableManager get pendingMutations =>
+      $$PendingMutationsTableTableManager(
+        _db.attachedDatabase,
+        _db.pendingMutations,
+      );
 }

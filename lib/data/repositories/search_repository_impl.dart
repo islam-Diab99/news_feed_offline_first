@@ -2,16 +2,16 @@ import '../../core/error/app_exception.dart';
 import '../../domain/entities/paged_articles.dart';
 import '../../domain/entities/topic.dart';
 import '../../domain/repositories/search_repository.dart';
-import '../datasources/local/app_database.dart';
+import '../datasources/local/daos/articles_dao.dart';
 import '../datasources/remote/api_client.dart';
 
 class SearchRepositoryImpl implements SearchRepository {
-  SearchRepositoryImpl({required ApiClient api, required AppDatabase db})
+  SearchRepositoryImpl({required ApiClient api, required ArticlesDao articles})
     : _api = api,
-      _db = db;
+      _articles = articles;
 
   final ApiClient _api;
-  final AppDatabase _db;
+  final ArticlesDao _articles;
 
   List<Topic>? _topics;
   final Map<String, List<String>> _sources = {};
@@ -30,16 +30,16 @@ class SearchRepositoryImpl implements SearchRepository {
         topicId: topicId,
         source: source,
       );
-      await _db.articleDao.saveServerArticles(response.items);
+      await _articles.saveServerArticles(response.items);
       return PagedArticles(
-        items: await _db.articleDao.articlesById(
+        items: await _articles.articlesById(
           response.items.map((a) => a.id).toList(),
         ),
         nextCursor: response.nextCursor,
         total: response.total,
       );
     } on NetworkException {
-      final hits = await _db.articleDao.searchCached(
+      final hits = await _articles.searchCached(
         query,
         topicId: topicId,
         source: source,

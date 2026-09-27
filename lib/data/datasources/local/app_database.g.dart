@@ -2525,7 +2525,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'articles_published_at',
     'CREATE INDEX articles_published_at ON articles (published_at)',
   );
-  late final ArticleDao articleDao = ArticleDao(this as AppDatabase);
+  late final ArticlesDao articlesDao = ArticlesDao(this as AppDatabase);
+  late final BookmarksDao bookmarksDao = BookmarksDao(this as AppDatabase);
+  late final ArticleDetailsDao articleDetailsDao = ArticleDetailsDao(
+    this as AppDatabase,
+  );
   late final FeedDao feedDao = FeedDao(this as AppDatabase);
   late final OutboxDao outboxDao = OutboxDao(this as AppDatabase);
   @override

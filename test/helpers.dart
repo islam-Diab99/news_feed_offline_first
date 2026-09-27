@@ -5,7 +5,12 @@ import 'package:drift/native.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:vlau_assessment/core/network/connectivity_service.dart';
 import 'package:vlau_assessment/data/datasources/local/app_database.dart';
+import 'package:vlau_assessment/data/datasources/local/db_transaction.dart';
 import 'package:vlau_assessment/data/datasources/remote/api_client.dart';
+import 'package:vlau_assessment/data/repositories/bookmark_repository_impl.dart';
+import 'package:vlau_assessment/data/repositories/feed_repository_impl.dart';
+import 'package:vlau_assessment/data/repositories/reaction_repository_impl.dart';
+import 'package:vlau_assessment/data/services/outbox_sync_service.dart';
 import 'package:vlau_assessment/domain/entities/article.dart';
 import 'package:vlau_assessment/domain/repositories/article_repository.dart';
 import 'package:vlau_assessment/domain/repositories/feed_repository.dart';
@@ -24,6 +29,50 @@ class MockArticleRepository extends Mock implements ArticleRepository {}
 /// constraints and cascades as the app instead of a hand-written fake.
 AppDatabase memoryDatabase() => AppDatabase(
   DatabaseConnection(NativeDatabase.memory(), closeStreamsSynchronously: true),
+);
+
+FeedRepositoryImpl feedRepository(ApiClient api, AppDatabase db) =>
+    FeedRepositoryImpl(
+      api: api,
+      articles: db.articlesDao,
+      feed: db.feedDao,
+      transaction: DbTransaction(db),
+    );
+
+BookmarkRepositoryImpl bookmarkRepository(
+  ApiClient api,
+  AppDatabase db,
+  ConnectivityService connectivity,
+) => BookmarkRepositoryImpl(
+  api: api,
+  bookmarks: db.bookmarksDao,
+  outbox: db.outboxDao,
+  transaction: DbTransaction(db),
+  connectivity: connectivity,
+);
+
+ReactionRepositoryImpl reactionRepository(
+  ApiClient api,
+  AppDatabase db,
+  ConnectivityService connectivity,
+) => ReactionRepositoryImpl(
+  api: api,
+  articles: db.articlesDao,
+  outbox: db.outboxDao,
+  transaction: DbTransaction(db),
+  connectivity: connectivity,
+);
+
+OutboxSyncService outboxSyncService(
+  ApiClient api,
+  AppDatabase db,
+  ConnectivityService connectivity,
+) => OutboxSyncService(
+  api: api,
+  articles: db.articlesDao,
+  outbox: db.outboxDao,
+  transaction: DbTransaction(db),
+  connectivity: connectivity,
 );
 
 Article makeArticle(

@@ -7,7 +7,6 @@ import 'package:vlau_assessment/core/error/app_exception.dart';
 import 'package:vlau_assessment/data/datasources/local/app_database.dart';
 import 'package:vlau_assessment/data/datasources/remote/api_client.dart';
 import 'package:vlau_assessment/data/repositories/bookmark_repository_impl.dart';
-import 'package:vlau_assessment/data/repositories/feed_repository_impl.dart';
 
 import '../helpers.dart';
 
@@ -21,10 +20,10 @@ void main() {
       AppDatabase(NativeDatabase(File('${tempDir.path}/news.sqlite')));
 
   BookmarkRepositoryImpl buildRepository() =>
-      BookmarkRepositoryImpl(api: api, db: db, connectivity: connectivity);
+      bookmarkRepository(api, db, connectivity);
 
   Future<bool> isBookmarked(String id) async =>
-      (await db.articleDao.article(id))!.isBookmarked;
+      (await db.articlesDao.article(id))!.isBookmarked;
 
   void stubFeed(List<String> ids, {bool bookmarked = false}) {
     when(() => api.getFeed(page: 1, topicId: null, source: null)).thenAnswer(
@@ -46,7 +45,7 @@ void main() {
     when(
       () => api.setBookmark(any(), bookmarked: any(named: 'bookmarked')),
     ).thenAnswer((_) async {});
-    await db.articleDao.saveServerArticles([makeArticle('a1')]);
+    await db.articlesDao.saveServerArticles([makeArticle('a1')]);
   });
 
   tearDown(() async {
@@ -127,7 +126,7 @@ void main() {
       db = openDatabase();
 
       stubFeed(['a1', 'a2']);
-      final feed = FeedRepositoryImpl(api: api, db: db);
+      final feed = feedRepository(api, db);
       await feed.loadFirstPage();
 
       final items = await feed.watchFeed().first;
@@ -142,7 +141,7 @@ void main() {
     await repository.toggle(makeArticle('a1', isBookmarked: true));
 
     stubFeed(['a1'], bookmarked: true);
-    final feed = FeedRepositoryImpl(api: api, db: db);
+    final feed = feedRepository(api, db);
     await feed.loadFirstPage();
 
     expect((await feed.watchFeed().first).single.isBookmarked, isFalse);
@@ -154,7 +153,7 @@ void main() {
       connectivity.setOnline(false);
       await buildRepository().toggle(makeArticle('a1'));
 
-      await db.articleDao.deleteArticles(['a1']);
+      await db.articlesDao.deleteArticles(['a1']);
 
       expect(await buildRepository().watchBookmarks().first, isEmpty);
       expect(await db.outboxDao.pending(), isEmpty);

@@ -6,7 +6,6 @@ import 'package:vlau_assessment/core/error/app_exception.dart';
 import 'package:vlau_assessment/data/datasources/local/app_database.dart';
 import 'package:vlau_assessment/data/datasources/remote/api_client.dart';
 import 'package:vlau_assessment/data/models/outbox_mutation.dart';
-import 'package:vlau_assessment/data/repositories/feed_repository_impl.dart';
 import 'package:vlau_assessment/data/repositories/reaction_repository_impl.dart';
 import 'package:vlau_assessment/data/services/outbox_sync_service.dart';
 import 'package:vlau_assessment/domain/entities/article.dart';
@@ -21,7 +20,7 @@ void main() {
 
   final article = makeArticle('a1', likes: 10, isLiked: false, version: 3);
 
-  Future<Article> stored() async => (await db.articleDao.article('a1'))!;
+  Future<Article> stored() async => (await db.articlesDao.article('a1'))!;
 
   When<Future<ReactionResponse>> whenReaction() => when(
     () => api.setReaction(
@@ -38,12 +37,8 @@ void main() {
     api = MockApi();
     db = memoryDatabase();
     connectivity = FakeConnectivity();
-    repository = ReactionRepositoryImpl(
-      api: api,
-      db: db,
-      connectivity: connectivity,
-    );
-    await db.articleDao.saveServerArticles([article]);
+    repository = reactionRepository(api, db, connectivity);
+    await db.articlesDao.saveServerArticles([article]);
   });
 
   tearDown(() async {
@@ -188,7 +183,7 @@ void main() {
         total: 1,
       ),
     );
-    final feed = FeedRepositoryImpl(api: api, db: db);
+    final feed = feedRepository(api, db);
     await feed.loadFirstPage();
 
     final item = (await feed.watchFeed().first).single;
@@ -200,7 +195,7 @@ void main() {
     late OutboxSyncService sync;
 
     setUp(() {
-      sync = OutboxSyncService(api: api, db: db, connectivity: connectivity);
+      sync = outboxSyncService(api, db, connectivity);
     });
 
     tearDown(() => sync.dispose());
