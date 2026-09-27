@@ -69,12 +69,13 @@ class HiveLocalStore implements LocalStore {
     final raw = _feeds.get(filterKey);
     if (raw == null) return null;
     final json = jsonDecode(raw) as Map<String, dynamic>;
-    final articles = <Article>[];
-
-    for (final id in (json['ids'] as List).cast<String>().toSet()) {
-      final article = await this.article(id);
-      if (article != null) articles.add(article);
-    }
+    final rawArticles = <String>[
+      for (final id in (json['ids'] as List).cast<String>().toSet())
+        ?_articles.get(id),
+    ];
+    final articles = rawArticles.length < _isolateDecodeThreshold
+        ? _decodeArticles(rawArticles)
+        : await compute(_decodeArticles, rawArticles);
     return CachedFeed(
       articles: articles,
       nextCursor: json['nextCursor'] as String?,
