@@ -21,12 +21,12 @@ class SearchRepositoryImpl implements SearchRepository {
     String query, {
     String? topicId,
     String? source,
-    int page = 1,
+    String? cursor,
   }) async {
     try {
       final response = await _api.search(
         query,
-        page: page,
+        page: _pageOf(cursor),
         topicId: topicId,
         source: source,
       );
@@ -54,6 +54,9 @@ class SearchRepositoryImpl implements SearchRepository {
       return PagedArticles(items: hits, total: hits.length, isStale: true);
     }
   }
+
+  int _pageOf(String? cursor) =>
+      cursor == null ? 1 : int.tryParse(cursor.split('_').last) ?? 1;
 
   @override
   Future<List<Topic>> topics() async {

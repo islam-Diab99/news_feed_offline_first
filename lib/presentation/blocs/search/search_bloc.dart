@@ -103,8 +103,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     if (state.hasQuery) await _execute(state.query, emit);
   }
 
-  /// Both filters reset in one handler so the reset costs a single search
-  /// instead of one per axis.
   Future<void> _onFiltersCleared(
     SearchFiltersCleared event,
     Emitter<SearchState> emit,
@@ -159,16 +157,13 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     final cursor = state.nextCursor;
     if (cursor == null || state.status != SearchStatus.success) return;
 
-    final nextPage = int.tryParse(cursor.split('_').last);
-    if (nextPage == null) return;
-
     emit(state.copyWith(isLoadingMore: true, loadMoreFailed: false));
     try {
       final page = await _repository.search(
         state.query,
         topicId: state.topicId,
         source: state.source,
-        page: nextPage,
+        cursor: cursor,
       );
       final seen = state.results.map((a) => a.id).toSet();
       emit(

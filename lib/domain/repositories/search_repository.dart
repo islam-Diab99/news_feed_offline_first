@@ -6,7 +6,7 @@ abstract interface class SearchRepository {
     String query, {
     String? topicId,
     String? source,
-    int page = 1,
+    String? cursor,
   });
 
   Future<List<Topic>> topics();
