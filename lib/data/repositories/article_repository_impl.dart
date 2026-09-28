@@ -30,8 +30,7 @@ class ArticleRepositoryImpl implements ArticleRepository {
           var merged = cached != null && cached.version >= detail.article.version
               ? detail.withArticle(cached)
               : detail;
-          // The bookmark box is the local source of truth; a server payload
-          // must never clear it.
+     
           final bookmarked = await _store.isBookmarked(id);
           if (merged.article.isBookmarked != bookmarked) {
             merged = merged.withArticle(

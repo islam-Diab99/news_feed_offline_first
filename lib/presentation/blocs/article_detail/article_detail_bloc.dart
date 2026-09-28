@@ -76,20 +76,10 @@ class ArticleDetailBloc extends Bloc<ArticleDetailEvent, ArticleDetailState> {
     final current = state;
     if (current is! ArticleDetailLoaded) return;
 
-    switch (event.update) {
-      case ArticleChanged(:final article):
-        if (article.id == current.detail.article.id) {
-          emit(current.copyWith(detail: current.detail.withArticle(article)));
-        } else {
-          final index = current.related.indexWhere((a) => a.id == article.id);
-          if (index == -1) return;
-          final related = [...current.related]..[index] = article;
-          emit(current.copyWith(related: related));
-        }
-      case ArticleRemoved(:final articleId):
-        if (articleId == current.detail.article.id) {
-          emit(const ArticleDetailGone(reason: 'removed_by_publisher'));
-        }
+    if (event.update case ArticleChanged(
+      :final article,
+    ) when article.id == current.detail.article.id) {
+      emit(current.copyWith(detail: current.detail.withArticle(article)));
     }
   }
 
